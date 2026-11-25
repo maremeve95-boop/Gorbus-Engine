@@ -89,11 +89,11 @@ function createAccountModal() {
         '<section class="gorbus-usage-card" aria-label="Uso mensual de Puter">' +
           '<div class="gorbus-usage-heading"><div><span class="gorbus-eyebrow">RECURSOS DE PUTER</span><h3>Uso mensual</h3></div>' +
           '<button type="button" class="gorbus-icon-button" data-account-refresh aria-label="Actualizar uso" title="Actualizar">' + icon('refresh') + '</button></div>' +
-          '<div class="gorbus-usage-numbers"><div><span>Disponible en la cuenta</span><strong data-account-remaining>—</strong></div>' +
+          '<div class="gorbus-usage-numbers"><div><span>Disponible según Puter</span><strong data-account-remaining>—</strong></div>' +
           '<div><span>Consumido este mes</span><strong data-account-used>—</strong></div></div>' +
           '<div class="gorbus-usage-track"><span data-account-progress></span></div>' +
           '<div class="gorbus-usage-foot"><span data-account-percent>Esperando datos de Puter</span><span data-account-allowance>—</span></div>' +
-          '<p class="gorbus-account-note">El disponible pertenece a toda tu cuenta. El desglose de actividad corresponde a Gorbus Engine y puede tardar alrededor de un minuto en actualizarse.</p>' +
+          '<p class="gorbus-account-note">Puter entrega el límite y el consumo mensual de recursos, además del desglose por API de esta aplicación. Las cifras dependen de los datos que devuelva Puter y pueden tardar alrededor de un minuto en actualizarse.</p>' +
         '</section>' +
         '<section class="gorbus-account-details"><div class="gorbus-section-heading"><h3>Actividad de Gorbus</h3><span>ESTE PROYECTO</span></div>' +
           '<div class="gorbus-usage-list" data-account-apis><div class="gorbus-usage-empty">Inicia sesión para consultar la actividad.</div></div></section>' +
