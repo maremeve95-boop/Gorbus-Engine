@@ -17,7 +17,7 @@ export function enhanceGorbusAISource(input) {
     'attachment system prompt'
   );
 
-  const liveHelpers = `const gorbusAILiveStreamFiles = new Map();
+  const liveHelpers = String.raw`const gorbusAILiveStreamFiles = new Map();
 function decodeGorbusJSONString(raw, start) {
   let output = '';
   for (let index = start; index < raw.length; index++) {
