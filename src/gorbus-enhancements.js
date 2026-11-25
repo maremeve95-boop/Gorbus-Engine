@@ -1,3 +1,4 @@
+import './gorbus-ai-attachments.js';
 import './gorbus-enhancements.css';
 
 const ACCOUNT_URL = 'https://puter.com/';
