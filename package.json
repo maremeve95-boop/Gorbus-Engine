@@ -1,6 +1,6 @@
 {
   "name": "gorbus-engine",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -10,7 +10,7 @@
     "dev": "node prepare.mjs && vite --host 0.0.0.0",
     "build": "node prepare.mjs && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "check": "node prepare.mjs && node --check src/main.js && node --check api/gorbus-ai.js"
+    "check": "node prepare.mjs && node --check src/main.js"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",
@@ -20,5 +20,5 @@
   "devDependencies": {
     "vite": "^7.1.0"
   },
-  "description": "Gorbus Engine 0.5 with Luau scripting, 3D physics, and integrated Gorbus AI powered by DeepSeek V4 Pro."
+  "description": "Gorbus Engine 0.6 with Luau scripting, Rapier physics, a Studio-style 3D editor and Gorbus AI via Puter."
 }
