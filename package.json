@@ -1,6 +1,6 @@
 {
   "name": "gorbus-engine",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -20,5 +20,5 @@
   "devDependencies": {
     "vite": "^7.1.0"
   },
-  "description": "Gorbus Engine 0.6 with Luau scripting, Rapier physics, a Studio-style 3D editor and Gorbus AI via Puter."
+  "description": "Gorbus Engine 0.6.1 with Luau scripting, Rapier physics, Studio-style editor and Gorbus AI via Puter DeepSeek V4.1 Flash."
 }
