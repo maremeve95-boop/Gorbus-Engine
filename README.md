@@ -1,4 +1,4 @@
-# Gorbus Engine 0.6.1 — Puter AI + Luau + Studio UI
+# Gorbus Engine 0.7 — Gorbus AI + Puter account manager + Luau
 
 Gorbus Engine es un editor 3D experimental para navegador, pensado también para Chromebook. La interfaz sigue el flujo de trabajo de las referencias que compartiste de Unity y Roblox Studio: **Toolbox a la izquierda, viewport 3D en el centro, Explorer y Properties a la derecha, Play/Pause/Stop arriba y Project/Console/Luau Scripts abajo**. Es una interfaz original de Gorbus, no una copia exacta.
 
@@ -73,3 +73,41 @@ Los archivos principales del editor se guardan en diez fragmentos dentro de `bui
 ## Corrección 0.6.1 — enrutamiento de Puter
 
 La versión 0.6.1 corrige el error `Model ... is not served by provider deepseek`. El modelo sigue siendo DeepSeek V4.1 Flash, pero ya no se fuerza el proveedor `deepseek`: Puter resuelve automáticamente qué proveedor sirve el modelo. También se quitan `fallback: false` y `reasoning_effort: high`, ya que no son necesarios para este modelo y el segundo parámetro está documentado por Puter como opción de modelos OpenAI. El modelo no se puede cambiar desde Gorbus.
+
+
+## Gorbus Engine 0.7 — Cuenta, IA y flujo de construcción
+
+### Cuenta y uso de Puter
+
+El botón **Cuenta** abre el panel de cuenta integrado. Incluye:
+
+- Estado de sesión y nombre de usuario de Puter.
+- Indicador de cuenta conectada o desconectada.
+- Recursos disponibles en el límite mensual de toda la cuenta.
+- Uso mensual estimado y barra de progreso cuando Puter devuelve esos datos.
+- Desglose de actividad por servicio de esta aplicación, número de llamadas y coste reportado.
+- Actualizar los datos, conectar Puter, volver a elegir/cambiar de cuenta y cerrar sesión.
+- Acceso a la web de Puter para gestionar la propia cuenta.
+
+El panel es informativo: **no incluye compras, recargas, tarjetas ni botones de facturación**. El saldo disponible se refiere a la cuenta completa de Puter; las líneas de actividad se refieren a Gorbus. Los datos de actividad pueden tardar aproximadamente un minuto en reflejar las últimas llamadas. Si Puter no devuelve un campo, Gorbus lo muestra como no disponible en lugar de inventar una cifra.
+
+### Gorbus AI: construir, revisar y probar
+
+Gorbus AI adopta un flujo de trabajo inspirado en asistentes de programación como Claude, pero mantiene su identidad propia:
+
+1. **Plan:** interpreta el objetivo, el estado del proyecto, los objetos y los scripts actuales.
+2. **Construcción:** genera un script completo y autocontenido, priorizando `main.luau`.
+3. **Revisión:** utiliza el compilador Luau real de `luau-web` para comprobar sintaxis antes de presentar el borrador. Si la primera versión no compila, solicita una única corrección al mismo modelo fijo y vuelve a comprobarla.
+4. **Entrega:** abre las pestañas de código para que puedas revisarlas y decidir si aplicar los cambios. Después debes usar **Play** para comprobar el comportamiento real del juego.
+
+El botón **Comprobar Luau** permite volver a compilar el borrador manualmente sin ejecutar el juego. La compilación de sintaxis no demuestra que la lógica sea correcta ni que el juego sea divertido; por eso todavía hace falta probarlo con Play y revisar los errores de la consola.
+
+El asistente intenta entregar juegos completos con controles, reglas, colisiones, feedback, estados de victoria/derrota y reinicio, siempre que las funciones reales de Gorbus lo permitan. No debe fingir que existen APIs de Roblox ni componentes que el motor no tenga. Actualmente Gorbus ejecuta automáticamente `main.luau`; no hay todavía un cargador completo de módulos `require` para varios scripts.
+
+### Interfaz y acabado visual
+
+La versión 0.7 añade un panel de cuenta propio, iconos SVG consistentes, estados de sesión, foco visible, iluminación ambiental suave en las barras y paneles, reflejos discretos, estados de botones y animaciones cortas con respeto a `prefers-reduced-motion`. El flujo de trabajo de IA muestra Plan, Construcción, Revisión y Entrega.
+
+### Modelo fijo
+
+El modelo continúa siendo **DeepSeek V4.1 Flash** a través de Puter. Gorbus no ofrece selector de modelos ni fuerza un proveedor que pueda provocar el error «Model is not served by provider». Las mejoras de esta versión son de flujo de trabajo, contexto, compilación y experiencia de usuario; no cambian silenciosamente el modelo seleccionado.
