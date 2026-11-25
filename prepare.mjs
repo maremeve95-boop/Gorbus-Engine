@@ -241,3 +241,9 @@ geSource = replaceBuildOnce(geSource,
 writeFileSync(gePath, geSource);
 
 console.log('Gorbus Engine GE 1.0.1 sources restored; physics, cameras, prefabs, history and persistence fixes applied.');
+
+// GE 1.0.2: apply Gorbus AI live script streaming and attachment context after source restoration.
+const { enhanceGorbusAISource } = await import('./scripts/ge-1.0.2-ai.mjs');
+main = enhanceGorbusAISource(readFileSync(mainPath, 'utf8'));
+writeFileSync(mainPath, main);
+console.log('Gorbus Engine GE 1.0.2: Gorbus AI live script editing and text/code attachments enabled.');
