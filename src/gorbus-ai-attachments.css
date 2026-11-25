@@ -1,0 +1,24 @@
+/* GE 1.0.2 — live code indicator and text/code attachments. */
+.gorbus-ai-live-status{display:inline-flex;align-items:center;min-height:18px;padding:0 7px;border:1px solid transparent;border-radius:5px;color:#7e8ba0;font-size:7px;font-weight:700;letter-spacing:.65px;white-space:nowrap}
+.gorbus-ai-live-status.is-live{border-color:rgba(112,205,159,.27);background:rgba(56,155,110,.1);color:#91dfb8;animation:gorbusLivePulse 1.2s ease-in-out infinite}
+.gorbus-ai-live-status.is-live:before{content:'';width:5px;height:5px;margin-right:5px;border-radius:50%;background:#75e0ae;box-shadow:0 0 9px rgba(117,224,174,.8)}
+@keyframes gorbusLivePulse{50%{box-shadow:0 0 12px rgba(104,201,152,.12)}}
+.gorbus-ai-draft-editor.gorbus-ai-streaming{border-color:rgba(113,204,157,.24);background-image:linear-gradient(90deg,rgba(74,178,126,.025),transparent 32%);caret-color:#9fe1bb}
+.gorbus-ai-attachments{display:grid;gap:6px;padding:0 10px 7px;border:1px solid rgba(137,147,169,.12);border-top:0;background:rgba(12,16,25,.56);transition:border-color .15s,background .15s}
+.gorbus-ai-attachments.is-drop-target{border-color:rgba(157,142,255,.64);background:rgba(104,88,183,.12)}
+.gorbus-ai-attachment-actions{display:flex;align-items:center;gap:9px;min-height:29px;flex-wrap:wrap}
+.gorbus-ai-attach-button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:25px;padding:0 8px;border:1px solid rgba(139,128,211,.23);border-radius:6px;background:rgba(113,96,201,.085);color:#bcb4ed;font-size:8px;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+.gorbus-ai-attach-button:hover{border-color:rgba(164,149,255,.55);background:rgba(122,104,213,.17);color:#eeeaff}
+.gorbus-ai-attach-button svg{width:13px;height:13px}
+.gorbus-ai-attachment-hint{color:#78869c;font-size:7px}
+.gorbus-ai-attachment-chips{display:flex;gap:5px;flex-wrap:wrap}
+.gorbus-ai-attachment-chips:empty{display:none}
+.gorbus-ai-attachment-chip{display:inline-flex;align-items:center;gap:6px;max-width:180px;min-height:22px;padding:0 5px 0 8px;border:1px solid rgba(120,161,145,.2);border-radius:5px;background:rgba(65,140,109,.08);color:#a8d6bf;font-size:8px}
+.gorbus-ai-attachment-chip>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gorbus-ai-attachment-remove{width:16px;height:16px;display:grid;place-items:center;flex:none;border:0;border-radius:4px;background:transparent;color:#9fbcae;font-size:13px;cursor:pointer}
+.gorbus-ai-attachment-remove:hover{background:rgba(227,118,118,.13);color:#ffc0c0}
+.gorbus-ai-attachment-status{min-height:0;margin:0;color:#8293a8;font-size:8px;line-height:1.4}
+.gorbus-ai-attachment-status:empty{display:none}
+.gorbus-ai-attachment-status.is-error{color:#e5a3a3}
+@media(max-width:600px){.gorbus-ai-attachment-hint{flex-basis:100%}.gorbus-ai-attachment-chip{max-width:130px}}
+@media(prefers-reduced-motion:reduce){.gorbus-ai-live-status.is-live{animation:none}}
