@@ -1,4 +1,4 @@
-# Gorbus Engine (GE) 1.0.1
+# Gorbus Engine (GE) 1.0.2
 
 Editor de videojuegos 3D para navegador, pensado para funcionar también en Chromebook. La interfaz toma como referencia la distribución de Unity que compartiste: **Hierarchy** a la izquierda, **Scene** en el centro, **Inspector** a la derecha y **Project / Assets** en el panel inferior. Gorbus mantiene su propio estilo y no copia recursos o iconos de Unity.
 
@@ -94,3 +94,21 @@ En Vercel: instalación `npm install`, build `npm run build`, directorio `dist`.
 | Build | Vite 7 |
 
 GE 1.0.1 es un editor web en desarrollo, no un reemplazo completo de Unity o Roblox Studio. El compilador Luau valida sintaxis; el comportamiento del juego debe probarse con **Play**.
+
+
+## GE 1.0.2 — Gorbus AI en directo y archivos adjuntos
+
+### Escritura de scripts en tiempo real
+- Gorbus AI transmite la respuesta de Puter y el editor detecta progresivamente los campos `path` y `content` del JSON.
+- Cuando comienza a llegar el contenido de `main.luau` o `Scripts/*.luau`, la pestaña aparece y el borrador se actualiza mientras llegan los fragmentos.
+- La cabecera muestra el estado **EN DIRECTO**. El borrador queda en solo lectura durante la generación para evitar que la escritura entrante sobrescriba cambios manuales.
+- Si se generan varios archivos, aparecen sus pestañas y se muestra el que se está escribiendo.
+- Cuando termina la respuesta, vuelve a habilitarse la edición manual. Los cambios siguen siendo borradores hasta pulsar **Aplicar al proyecto**.
+- La autocorrección de sintaxis Luau también puede mostrar la segunda escritura en directo.
+
+### Adjuntar archivos
+Usa **Adjuntar archivos** o arrastra archivos al cuadro de Gorbus AI. Se leen como texto y se incorporan al contexto de la petición. Formatos admitidos: JavaScript y TypeScript, HTML, CSS, JSON/JSONC, Markdown, TXT, CSV, XML, SVG, YAML, TOML, Python, C/C++, C#, Java, Go, Rust, SQL, Lua/Luau, shell, Vue, Svelte, Astro, shaders y otros archivos de texto de configuración.
+
+Límites: hasta 5 archivos, 128 KB por archivo y 384 KB en total. Puedes quitar cada adjunto antes de enviar. Los formatos binarios (por ejemplo, PDF, ZIP, imágenes y ejecutables) no se interpretan con este lector de texto. Los archivos se leen como contenido, no se ejecutan.
+
+Gorbus AI puede explicar, revisar o tomar como referencia los adjuntos. El asistente sigue generando scripts Luau dentro de los paths admitidos por el motor; adjuntar un HTML o JavaScript no significa que el runtime del juego pueda ejecutar esos archivos ni que se apliquen automáticamente al propio editor.
