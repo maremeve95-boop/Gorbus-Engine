@@ -23,12 +23,17 @@ const wanted = new Set(['index.html', 'styles.css', 'src/main.js']);
 const written = new Set();
 let offset = 0;
 
+function readTarString(buffer) {
+  const end = buffer.indexOf(0);
+  return buffer.subarray(0, end === -1 ? buffer.length : end).toString('utf8');
+}
+
 while (offset + 512 <= archive.length) {
   const header = archive.subarray(offset, offset + 512);
-  const name = header.subarray(0, 100).toString('utf8').replace(/\\0.*$/, '');
+  const name = readTarString(header.subarray(0, 100));
   if (!name) break;
 
-  const sizeText = header.subarray(124, 136).toString('ascii').replace(/\\0.*$/, '').trim();
+  const sizeText = readTarString(header.subarray(124, 136)).trim();
   const size = Number.parseInt(sizeText || '0', 8);
   if (!Number.isFinite(size) || size < 0) {
     throw new Error(`Invalid TAR entry size for "${name}".`);
