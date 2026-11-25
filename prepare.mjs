@@ -120,8 +120,8 @@ if (main.includes(systemMarker) && !main.includes('GORBUS BUILD WORKFLOW — act
     '- Los objetos creados con createObject son visuales; no inventes colliders ni Rigidbody. Usa colisiones manuales si corresponde.',
     '- Si falta una capacidad, explica la limitación y ofrece una alternativa honesta.',
     '- Un juego pequeño y funcional es mejor que uno enorme e incompleto.'
-  ].join('\\n');
-  main = main.slice(0, systemEnd) + '\\n\\n' + buildPrompt + main.slice(systemEnd);
+  ].join('\n');
+  main = main.slice(0, systemEnd) + '\n\n' + buildPrompt + main.slice(systemEnd);
 }
 
 // Compile the generated main.luau before showing it. If Luau rejects it, ask the same fixed model for one repair.
@@ -149,9 +149,9 @@ if (!main.includes('gorbusPreflightNotice') && main.includes('const data=parseGo
     '      }else{gorbusPreflightNotice="No llegó una versión corregida de main.luau. El borrador sigue pendiente de revisión.";}',
     '    }catch(repairError){gorbusPreflightNotice="No se pudo completar la autocorrección Luau: "+(repairError?.message||String(repairError));}',
     '  }',
-    '  data.message=(data.message||"He preparado una propuesta.")+"\\n\\n"+gorbusPreflightNotice;',
+    '  data.message=(data.message||"He preparado una propuesta.")+"\n\n"+gorbusPreflightNotice;',
     '}'
-  ].join('\\n');
+  ].join('\n');
   main=main.replace('const data=parseGorbusAIResponse(raw);',preflightBlock);
 }
 
@@ -159,7 +159,7 @@ if (!main.includes('gorbusPreflightNotice') && main.includes('const data=parseGo
 if (!html.includes('/src/gorbus-enhancements.js')) {
   const bodyEnd=html.lastIndexOf('</body>');
   if(bodyEnd<0) throw new Error('Could not find </body> while attaching Gorbus enhancements.');
-  html=html.slice(0,bodyEnd)+'\\n<script type="module" src="/src/gorbus-enhancements.js"></script>\\n'+html.slice(bodyEnd);
+  html=html.slice(0,bodyEnd)+'\n<script type="module" src="/src/gorbus-enhancements.js"></script>\n'+html.slice(bodyEnd);
 }
 writeFileSync(mainPath,main);
 writeFileSync(htmlPath,html);
