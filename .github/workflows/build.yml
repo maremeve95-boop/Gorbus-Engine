@@ -1,4 +1,4 @@
-name: Gorbus Engine GE 1.0.1
+name: Gorbus Engine GE 1.0.2
 
 on:
   push:
@@ -23,10 +23,10 @@ jobs:
       - name: Build production bundle
         run: npm run build
       - name: Package source ZIP
-        run: zip -qr Gorbus_Engine_GE_1.0.1.zip . -x '.git/*' 'node_modules/*' 'dist/*'
+        run: zip -qr Gorbus_Engine_GE_1.0.2.zip . -x '.git/*' 'node_modules/*' 'dist/*'
       - name: Upload source ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: Gorbus-Engine-GE-1.0.1
-          path: Gorbus_Engine_GE_1.0.1.zip
+          name: Gorbus-Engine-GE-1.0.2
+          path: Gorbus_Engine_GE_1.0.2.zip
           retention-days: 14
