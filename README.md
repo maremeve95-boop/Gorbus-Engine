@@ -128,3 +128,8 @@ Luau es un proyecto de código abierto distribuido bajo licencia MIT. `luau-web`
 - La biblioteca reciente es local al navegador y no sincroniza proyectos en la nube.
 - Las herramientas de animación, audio, terreno, navegación, multijugador, prefabs avanzados y exportación de juegos aún no están implementadas.
 - Este paquete corrige la resolución de dependencias y muestra un aviso visible si falla el arranque. Aun así, debe ejecutarse `npm install` y `npm run build` en Vercel o en un entorno con npm antes de probar Play en Chrome.
+
+
+## Cómo se empaqueta el código fuente en GitHub
+
+Los tres archivos principales del editor (`index.html`, `styles.css` y `src/main.js`) se guardan comprimidos en siete fragmentos dentro de `build-assets/`. Es una forma de transportar de manera fiable los archivos grandes a este repositorio. **No tienes que unirlos a mano.** El comando `npm run build` ejecuta primero `prepare.mjs`, que concatena los fragmentos, verifica su SHA-256, los descomprime y reconstruye los archivos antes de lanzar Vite. Si falta o se altera un fragmento, la compilación se detiene con un error claro.
