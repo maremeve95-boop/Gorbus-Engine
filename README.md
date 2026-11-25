@@ -1,4 +1,4 @@
-# Gorbus Engine 0.6 — Puter AI + Luau + Studio UI
+# Gorbus Engine 0.6.1 — Puter AI + Luau + Studio UI
 
 Gorbus Engine es un editor 3D experimental para navegador, pensado también para Chromebook. La interfaz sigue el flujo de trabajo de las referencias que compartiste de Unity y Roblox Studio: **Toolbox a la izquierda, viewport 3D en el centro, Explorer y Properties a la derecha, Play/Pause/Stop arriba y Project/Console/Luau Scripts abajo**. Es una interfaz original de Gorbus, no una copia exacta.
 
@@ -8,13 +8,13 @@ Gorbus AI está integrado en el editor. Puede leer el contexto de la escena y lo
 
 ### Modelo fijo
 
-- Proveedor: **DeepSeek**, a través de Puter.js.
-- Modelo fijo: **DeepSeek V4.1 Flash 1017** (`deepseek/deepseek-v4.1-flash-1017`).
-- Razonamiento: `high`.
-- `fallback: false`: si el proveedor DeepSeek o ese modelo no está disponible, Gorbus muestra el error en vez de cambiar silenciosamente a otro proveedor.
+- Modelo fijo: **DeepSeek V4.1 Flash** (`deepseek/deepseek-v4.1-flash`).
+- Puter selecciona automáticamente un proveedor que sirva ese modelo; Gorbus no fuerza `provider: "deepseek"`.
+- Se deja activado el enrutamiento/fallback normal de Puter para evitar el error «Model ... is not served by provider deepseek».
+- No se fija `reasoning_effort`: la documentación genérica de Puter limita esa opción a modelos OpenAI.
 - No existe selector de modelos en Gorbus Engine.
 
-La ficha de Puter describe esta actualización de octubre de 2026 como una versión mejorada para tareas de programación y agentes de código. Eso no significa que el modelo esté entrenado específicamente para la API de Gorbus o que sea infalible con Luau: el asistente añade instrucciones especializadas, ejemplos y la API real disponible en el motor.
+La documentación oficial de Puter muestra directamente este identificador en sus ejemplos de `puter.ai.chat()` y lo incluye entre los modelos DeepSeek disponibles. Eso no significa que el modelo esté entrenado específicamente para la API de Gorbus o que sea infalible con Luau: el asistente añade instrucciones especializadas, ejemplos y la API real disponible en el motor.
 
 ### Conectar Puter
 
@@ -43,7 +43,7 @@ No se necesita `DEEPSEEK_API_KEY` ni un endpoint propio que guarde claves. Puter
 | Editor 3D | Three.js |
 | Física 3D | Rapier |
 | Lenguaje | Luau real en WebAssembly (`luau-web`) |
-| Asistente IA | Puter.js + DeepSeek V4.1 Flash 1017 |
+| Asistente IA | Puter.js + DeepSeek V4.1 Flash |
 | Build | Vite |
 
 El script principal que ejecuta esta preview es `main.luau`. Usa `onStart()`, `onUpdate(dt: number)` y `onStop()`. La API de Gorbus incluye `Gorbus.log`, `find`, `createObject`, `destroyObject`, `move`, `setPosition`, `getPosition`, `setScale`, `setColor`, `setVelocity`, `setHorizontalVelocity`, `applyImpulse`, `hasRigidbody`, `isKeyDown`, `isKeyJustPressed` y `getTime`.
@@ -68,3 +68,8 @@ Gorbus Engine sigue siendo un prototipo de editor web, no un sustituto completo 
 ## Cómo se prepara el código en GitHub
 
 Los archivos principales del editor se guardan en diez fragmentos dentro de `build-assets/v06-source-*.br64`. No tienes que unirlos a mano: `npm run dev` y `npm run build` ejecutan primero `prepare.mjs`, que concatena los fragmentos, verifica SHA-256, restaura los tres archivos y aplica los pequeños parches del menú antes de arrancar Vite.
+
+
+## Corrección 0.6.1 — enrutamiento de Puter
+
+La versión 0.6.1 corrige el error `Model ... is not served by provider deepseek`. El modelo sigue siendo DeepSeek V4.1 Flash, pero ya no se fuerza el proveedor `deepseek`: Puter resuelve automáticamente qué proveedor sirve el modelo. También se quitan `fallback: false` y `reasoning_effort: high`, ya que no son necesarios para este modelo y el segundo parámetro está documentado por Puter como opción de modelos OpenAI. El modelo no se puede cambiar desde Gorbus.
