@@ -10,7 +10,7 @@
     "dev": "node prepare.mjs && vite --host 0.0.0.0",
     "build": "node prepare.mjs && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "check": "node prepare.mjs && node --check src/main.js"
+    "check": "node --check prepare.mjs && node prepare.mjs && node --check src/main.js && node --check src/gorbus-enhancements.js"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",
