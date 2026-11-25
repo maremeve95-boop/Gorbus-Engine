@@ -100,4 +100,68 @@ html = html
   .replaceAll('DEEPSEEK V4.1 FLASH 1017', 'DEEPSEEK V4.1 FLASH');
 writeFileSync(htmlPath, html);
 
-console.log('Gorbus Engine 0.6 source restored, UI patches applied, and Puter model routing fixed.');
+
+// Account manager and syntax-checked game-building workflow.
+const systemMarker = 'const GORBUS_AI_SYSTEM = `';
+if (main.includes(systemMarker) && !main.includes('GORBUS BUILD WORKFLOW — actúa como un socio de ingeniería')) {
+  const systemStart = main.indexOf(systemMarker);
+  const systemEnd = main.indexOf('`;', systemStart + systemMarker.length);
+  if (systemEnd < 0) throw new Error('Could not locate the end of GORBUS_AI_SYSTEM.');
+  const buildPrompt = [
+    'GORBUS BUILD WORKFLOW — actúa como un socio de ingeniería de videojuegos:',
+    '- Entrega un prototipo jugable, no solo una explicación.',
+    '- Comprende género, objetivo, controles, cámara y estado actual del proyecto antes de implementar.',
+    '- Planifica brevemente; después implementa el juego completo. Devuelve pasos ordenados para probarlo.',
+    '- Prioriza un main.luau completo y autocontenido que cree los objetos necesarios al iniciar y contenga el ciclo de juego.',
+    '- No devuelvas fragmentos, pseudocódigo, marcadores TODO ni funciones inventadas.',
+    '- Incluye controles, reglas, colisiones coherentes, feedback visual, victoria/derrota y reinicio cuando la API lo permita.',
+    '- Usa dt para el movimiento temporal y evita crear objetos en cada fotograma.',
+    '- Revisa nombres, callbacks, APIs disponibles, sintaxis Luau y el bucle de juego antes de entregar.',
+    '- Los objetos creados con createObject son visuales; no inventes colliders ni Rigidbody. Usa colisiones manuales si corresponde.',
+    '- Si falta una capacidad, explica la limitación y ofrece una alternativa honesta.',
+    '- Un juego pequeño y funcional es mejor que uno enorme e incompleto.'
+  ].join('\\n');
+  main = main.slice(0, systemEnd) + '\\n\\n' + buildPrompt + main.slice(systemEnd);
+}
+
+// Compile the generated main.luau before showing it. If Luau rejects it, ask the same fixed model for one repair.
+if (!main.includes('gorbusPreflightNotice') && main.includes('const data=parseGorbusAIResponse(raw);')) {
+  const preflightBlock = [
+    'let data=parseGorbusAIResponse(raw);',
+    'let gorbusPreflightNotice="";',
+    'const proposedMain=Array.isArray(data.files)?data.files.find(file=>file.path==="main.luau"&&typeof file.content==="string"):null;',
+    'if(proposedMain&&window.GorbusUpgradeAI&&typeof window.GorbusUpgradeAI.compileLuau==="function"){',
+    '  const firstCheck=await window.GorbusUpgradeAI.compileLuau(proposedMain.content);',
+    '  if(firstCheck.ok){gorbusPreflightNotice="Comprobación automática: el compilador Luau acepta main.luau.";}',
+    '  else{',
+    '    status.querySelector("p").textContent="He detectado un error de sintaxis Luau. Estoy intentando corregirlo…";',
+    '    try{',
+    '      const repairMessages=messages.concat([{role:"assistant",content:raw},{role:"user",content:"El compilador Luau real de luau-web ha rechazado main.luau. Error: "+firstCheck.message+". Corrige el código completo, conserva la jugabilidad solicitada, usa solo la API real de Gorbus y devuelve exclusivamente el JSON válido exigido por el sistema. No expliques el error fuera del JSON."}]);',
+    '      const repairStream=await puter.ai.chat(repairMessages,{model:GORBUS_AI_MODEL,stream:true,temperature:0.1,max_tokens:10000});',
+    '      let repairRaw="";',
+    '      for await(const repairPart of repairStream){if(repairPart?.type==="error")throw new Error(repairPart.message||"Error al corregir Luau");if(repairPart?.type==="text"&&repairPart.text)repairRaw+=repairPart.text;}',
+    '      const repairedData=parseGorbusAIResponse(repairRaw);',
+    '      const repairedMain=Array.isArray(repairedData.files)?repairedData.files.find(file=>file.path==="main.luau"&&typeof file.content==="string"):null;',
+    '      if(repairedMain){',
+    '        const secondCheck=await window.GorbusUpgradeAI.compileLuau(repairedMain.content);',
+    '        if(secondCheck.ok){data=repairedData;gorbusPreflightNotice="He corregido un error detectado en el primer borrador. El segundo borrador supera la compilación Luau.";}',
+    '        else{gorbusPreflightNotice="La IA intentó corregir el script, pero el compilador todavía detecta un error: "+secondCheck.message+". Revisa el borrador y usa Comprobar Luau.";}',
+    '      }else{gorbusPreflightNotice="No llegó una versión corregida de main.luau. El borrador sigue pendiente de revisión.";}',
+    '    }catch(repairError){gorbusPreflightNotice="No se pudo completar la autocorrección Luau: "+(repairError?.message||String(repairError));}',
+    '  }',
+    '  data.message=(data.message||"He preparado una propuesta.")+"\\n\\n"+gorbusPreflightNotice;',
+    '}'
+  ].join('\\n');
+  main=main.replace('const data=parseGorbusAIResponse(raw);',preflightBlock);
+}
+
+// Attach the enhancement module after the restored editor sources have been prepared.
+if (!html.includes('/src/gorbus-enhancements.js')) {
+  const bodyEnd=html.lastIndexOf('</body>');
+  if(bodyEnd<0) throw new Error('Could not find </body> while attaching Gorbus enhancements.');
+  html=html.slice(0,bodyEnd)+'\\n<script type="module" src="/src/gorbus-enhancements.js"></script>\\n'+html.slice(bodyEnd);
+}
+writeFileSync(mainPath,main);
+writeFileSync(htmlPath,html);
+
+console.log('Gorbus Engine 0.7 sources restored, account manager injected, and Luau preflight enabled.');
