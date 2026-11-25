@@ -66,4 +66,38 @@ main = main
   .replace("sceneData.createdWith='Gorbus Engine 0.5';sceneData.version=4;", "sceneData.createdWith='Gorbus Engine 0.6';sceneData.version=6;")
   .replace("Gorbus Engine 0.5 listo.", "Gorbus Engine 0.6 listo.");
 writeFileSync(mainPath, main);
-console.log('Gorbus Engine 0.6 source restored and UI menu patches applied.');
+
+// Fix the Puter routing for DeepSeek V4.1 Flash.
+// Keep the model fixed, but do not pin a provider: Puter will choose a provider
+// that actually serves the model. reasoning_effort is only documented for
+// OpenAI models in Puter's generic chat options, so DeepSeek uses its defaults.
+const oldModelPattern = /const GORBUS_AI_MODEL\s*=\s*['"]deepseek\/deepseek-v4\.1-flash-1017['"]\s*;/;
+const newModelDeclaration = "const GORBUS_AI_MODEL = 'deepseek/deepseek-v4.1-flash';";
+if (oldModelPattern.test(main)) {
+  main = main.replace(oldModelPattern, newModelDeclaration);
+} else if (!/const GORBUS_AI_MODEL\s*=\s*['"]deepseek\/deepseek-v4\.1-flash['"]\s*;/.test(main)) {
+  throw new Error('Could not find Gorbus AI model declaration while applying the Puter routing fix.');
+}
+main = main
+  .replace(/const GORBUS_AI_PROVIDER\s*=\s*['"]deepseek['"]\s*;\s*/g, '')
+  .replace(/provider\s*:\s*GORBUS_AI_PROVIDER\s*,?/g, '')
+  .replace(/fallback\s*:\s*false\s*,?/g, '')
+  .replace(/reasoning_effort\s*:\s*['"]high['"]\s*,?/g, '');
+
+if (main.includes('GORBUS_AI_PROVIDER') || main.includes('reasoning_effort')) {
+  throw new Error('Old Puter provider or reasoning options remain after the routing fix.');
+}
+if (!main.includes(newModelDeclaration)) {
+  throw new Error('The fixed DeepSeek V4.1 Flash model was not applied to Gorbus AI.');
+}
+writeFileSync(mainPath, main);
+
+// Keep the fixed model label in the UI synchronized with the API request.
+const htmlPath = resolve('index.html');
+let html = readFileSync(htmlPath, 'utf8');
+html = html
+  .replaceAll('DeepSeek V4.1 Flash 1017', 'DeepSeek V4.1 Flash')
+  .replaceAll('DEEPSEEK V4.1 FLASH 1017', 'DEEPSEEK V4.1 FLASH');
+writeFileSync(htmlPath, html);
+
+console.log('Gorbus Engine 0.6 source restored, UI patches applied, and Puter model routing fixed.');
