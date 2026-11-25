@@ -149,7 +149,7 @@ if (!main.includes('gorbusPreflightNotice') && main.includes('const data=parseGo
     '      }else{gorbusPreflightNotice="No llegó una versión corregida de main.luau. El borrador sigue pendiente de revisión.";}',
     '    }catch(repairError){gorbusPreflightNotice="No se pudo completar la autocorrección Luau: "+(repairError?.message||String(repairError));}',
     '  }',
-    '  data.message=(data.message||"He preparado una propuesta.")+"\n\n"+gorbusPreflightNotice;',
+    '  data.message=(data.message||"He preparado una propuesta.")+"\\n\\n"+gorbusPreflightNotice;',
     '}'
   ].join('\n');
   main=main.replace('const data=parseGorbusAIResponse(raw);',preflightBlock);
