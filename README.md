@@ -1,4 +1,4 @@
-# Gorbus Engine 0.4 — Build fix
+# Gorbus Engine 0.5 — Gorbus AI + Luau
 
 Gorbus Engine es un editor 3D experimental que funciona en el navegador. Esta versión incorpora una pantalla inicial para crear proyectos a partir de plantillas, una biblioteca local de proyectos, un editor de escena y scripting con **Luau real** ejecutado mediante WebAssembly.
 
@@ -133,3 +133,42 @@ Luau es un proyecto de código abierto distribuido bajo licencia MIT. `luau-web`
 ## Cómo se empaqueta el código fuente en GitHub
 
 Los tres archivos principales del editor (`index.html`, `styles.css` y `src/main.js`) se guardan comprimidos en siete fragmentos dentro de `build-assets/`. Es una forma de transportar de manera fiable los archivos grandes a este repositorio. **No tienes que unirlos a mano.** El comando `npm run build` ejecuta primero `prepare.mjs`, que concatena los fragmentos, verifica su SHA-256, los descomprime y reconstruye los archivos antes de lanzar Vite. Si falta o se altera un fragmento, la compilación se detiene con un error claro.
+
+
+## Gorbus AI (DeepSeek fijo)
+
+La versión 0.5 integra **Gorbus AI**, un asistente de programación para crear y modificar scripts del proyecto:
+
+- El botón **✦ Gorbus AI** abre el panel de conversación dentro del editor.
+- La IA recibe el nombre del proyecto, los objetos de escena y el contenido de los scripts Luau guardados.
+- Los archivos sugeridos aparecen en ventanas/pestañas de código y se muestran progresivamente.
+- Puedes revisar y editar cada borrador; los cambios solo entran al proyecto cuando pulsas **Aplicar al proyecto**. También puedes descartarlos.
+- No hay selector de modelos. El backend fija `deepseek-v4-pro` con `thinking: { type: "enabled" }`.
+- La API valida las rutas y tamaños de los archivos y solo acepta `main.luau` y `Scripts/*.luau`.
+
+**Acerca de DeepSeek-R1:** la API oficial retiró el identificador heredado `deepseek-reasoner` el 24 de julio de 2026. La API actual documenta `deepseek-v4-pro` y `deepseek-flash`; por eso Gorbus 0.5 usa V4 Pro con razonamiento activado, fijo y sin selector. No se presenta falsamente como R1. Consulta https://api-docs.deepseek.com/updates/ y https://api-docs.deepseek.com/api/list-models/.
+
+### Activar Gorbus AI en Vercel
+
+El asistente requiere una clave API de DeepSeek. **Nunca la escribas en el código del navegador, en GitHub ni en el chat.**
+
+1. Abre tu proyecto de Gorbus Engine en Vercel.
+2. Entra en **Settings → Environment Variables**.
+3. Añade la variable `DEEPSEEK_API_KEY` y pega el secreto directamente en Vercel.
+4. Activa la variable para Production y Preview.
+5. Guarda y vuelve a desplegar.
+
+El navegador solo llama a `/api/gorbus-ai`; la clave permanece en la función servidor `api/gorbus-ai.js`. Si no se ha configurado, Gorbus AI muestra el error `AI_NOT_CONFIGURED` y el resto del editor sigue disponible.
+
+La API puede generar costes según el uso y las tarifas de DeepSeek. La cuenta, la clave y cualquier presupuesto deben ser gestionados por un adulto responsable. Hay un límite básico de ocho solicitudes por minuto por instancia, pero un sitio público todavía podría recibir llamadas de otras personas; revisa el consumo y restringe el acceso al sitio cuando sea necesario.
+
+### Configuración del proyecto
+
+- **Install command:** `npm install`
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+- **Node:** 22 (indicado en `.nvmrc`)
+
+`vercel.json` configura la función `api/gorbus-ai.js` y no utiliza una reescritura global que oculte la ruta de la API. El proyecto reconstruye los archivos grandes del editor desde nueve fragmentos en `build-assets/v05-source-*.br64`; `prepare.mjs` verifica SHA-256 antes de que Vite compile. No unas esos fragmentos manualmente.
+
+Para probar también la función API en local, usa Vercel CLI (`vercel dev`) y configura `DEEPSEEK_API_KEY` como variable privada del entorno local. No abras `index.html` con `file://`.
