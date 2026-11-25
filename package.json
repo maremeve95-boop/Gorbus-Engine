@@ -1,6 +1,6 @@
 {
   "name": "gorbus-engine",
-  "version": "0.7.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -10,7 +10,7 @@
     "dev": "node prepare.mjs && vite --host 0.0.0.0",
     "build": "node prepare.mjs && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "check": "node --check prepare.mjs && node prepare.mjs && node --check src/main.js && node --check src/gorbus-enhancements.js"
+    "check": "node --check prepare.mjs && node prepare.mjs && node --check ge101-prepare.mjs && node --check src/main.js && node --check src/gorbus-enhancements.js && node --check src/ge101.js"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",
@@ -20,5 +20,5 @@
   "devDependencies": {
     "vite": "^7.1.0"
   },
-  "description": "Gorbus Engine 0.7 with full-game AI workflow, Luau preflight compilation, Puter account and usage management, Three.js and Rapier physics."
+  "description": "Gorbus Engine GE 1.0.1: Unity-style editor, Rapier collision events, reusable prefabs, cameras, Luau AI and undo/redo."
 }
