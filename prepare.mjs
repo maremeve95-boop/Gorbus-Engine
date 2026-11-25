@@ -1,7 +1,6 @@
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { brotliDecompressSync } from 'node:zlib';
-import { brotliDecompressSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 
 const partPaths = Array.from({ length: 10 }, (_, index) =>
