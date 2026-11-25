@@ -1,6 +1,7 @@
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { brotliDecompressSync } from 'node:zlib';
+import { brotliDecompressSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 
 const partPaths = Array.from({ length: 10 }, (_, index) =>
@@ -164,4 +165,19 @@ if (!html.includes('/src/gorbus-enhancements.js')) {
 writeFileSync(mainPath,main);
 writeFileSync(htmlPath,html);
 
-console.log('Gorbus Engine 0.7 sources restored, account manager injected, and Luau preflight enabled.');
+// Restore the compact GE 1.0.1 extension bundle before importing its patch module.
+const gePatchParts = Array.from({ length: 4 }, (_, index) =>
+  readFileSync(resolve('build-assets', `ge101-patch-${String(index + 1).padStart(2, '0')}.b64`), 'utf8').trim()
+);
+const gePatchBundle = JSON.parse(brotliDecompressSync(Buffer.from(gePatchParts.join(''), 'base64')).toString('utf8'));
+for (const [relativePath, content] of Object.entries(gePatchBundle)) {
+  if (!['ge101-prepare.mjs', 'src/ge101.js', 'src/ge101.css'].includes(relativePath)) {
+    throw new Error('Unexpected file in GE patch bundle: ' + relativePath);
+  }
+  const target = resolve(relativePath);
+  mkdirSync(dirname(target), { recursive: true });
+  writeFileSync(target, content);
+}
+await import('./ge101-prepare.mjs');
+
+console.log('Gorbus Engine GE 1.0.1 sources restored, Rapier events and editor upgrades applied.');
