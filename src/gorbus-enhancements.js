@@ -102,7 +102,7 @@ function createAccountModal() {
         '<p class="gorbus-account-feedback" data-account-feedback aria-live="polite"></p>' +
       '</div>' +
       '<footer class="gorbus-account-footer"><div class="gorbus-account-footer-links"><a href="' + ACCOUNT_URL + '" target="_blank" rel="noopener noreferrer">Abrir Puter ' + icon('external') + '</a></div>' +
-        '<div class="gorbus-account-actions"><button type="button" class="gorbus-account-switch" data-account-switch>Cambiar cuenta</button>' +
+        '<div class="gorbus-account-actions"><button type="button" class="gorbus-account-connect" data-account-connect>Conectar Puter</button><button type="button" class="gorbus-account-switch" data-account-switch>Cambiar cuenta</button>' +
         '<button type="button" class="gorbus-account-signout" data-account-signout>' + icon('logout') + ' Cerrar sesión</button></div></footer>' +
     '</section>';
   document.body.appendChild(accountModal);
@@ -113,6 +113,7 @@ function createAccountModal() {
     if (event.key === 'Escape' && accountModal && !accountModal.hidden) closeAccount();
   });
   accountModal.querySelector('[data-account-refresh]').addEventListener('click', refreshAccount);
+  accountModal.querySelector('[data-account-connect]').addEventListener('click', connectAccount);
   accountModal.querySelector('[data-account-switch]').addEventListener('click', switchAccount);
   accountModal.querySelector('[data-account-signout]').addEventListener('click', signOut);
   return accountModal;
@@ -137,8 +138,10 @@ function setAccountSignedIn(signedIn) {
     badge.textContent = signedIn ? 'CONECTADA' : 'SIN CONECTAR';
     badge.classList.toggle('is-connected', signedIn);
   }
+  const connectButton = accountModal && accountModal.querySelector('[data-account-connect]');
   const switchButton = accountModal && accountModal.querySelector('[data-account-switch]');
   const signoutButton = accountModal && accountModal.querySelector('[data-account-signout]');
+  if (connectButton) connectButton.hidden = signedIn;
   if (switchButton) switchButton.disabled = !signedIn;
   if (signoutButton) signoutButton.disabled = !signedIn;
 }
@@ -292,6 +295,25 @@ function closeAccount() {
   if (accountButton) accountButton.focus({ preventScroll: true });
 }
 
+function connectAccount() {
+  const auth = window.puter && window.puter.auth;
+  if (auth && typeof auth.signIn === 'function') {
+    setAccountFeedback('Abriendo el inicio de sesión de Puter…');
+    // Start the popup synchronously from this button press.
+    const result = auth.signIn();
+    Promise.resolve(result).then(refreshAccount).catch(function(error) {
+      setAccountFeedback((error && (error.msg || error.message)) || 'No se pudo conectar Puter.', true);
+    });
+    return;
+  }
+  closeAccount();
+  const openAI = document.querySelector('#gorbusAiOpen');
+  if (openAI) openAI.click();
+  setTimeout(function() {
+    const connect = document.querySelector('#gorbusAiConnect');
+    if (connect) connect.click();
+  }, 80);
+}
 function switchAccount() {
   const auth = window.puter && window.puter.auth;
   if (!auth || typeof auth.signIn !== 'function') {
@@ -430,7 +452,10 @@ function installWorkflow() {
       setStage(3, 'La propuesta está lista para revisar. Comprueba el script antes de aplicarlo.', 'LISTO PARA REVISAR');
     }
   }
-  new MutationObserver(updateBusy).observe(send, { attributes: true, attributeFilter: ['disabled'] });
+  if (!send.dataset.gorbusBusyObserver) {
+    send.dataset.gorbusBusyObserver = '1';
+    new MutationObserver(updateBusy).observe(send, { attributes: true, attributeFilter: ['disabled'] });
+  }
   addPreflightButton();
   return true;
 }
