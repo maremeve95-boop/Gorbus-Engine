@@ -1,0 +1,116 @@
+/* Gorbus Engine: account manager, coding workflow and soft studio lighting. */
+.gorbus-account-entry{position:relative;display:inline-flex!important;align-items:center;justify-content:center;gap:7px;min-height:30px;padding:0 10px!important;margin-left:6px;border:1px solid rgba(151,137,255,.25)!important;border-radius:7px!important;background:linear-gradient(145deg,rgba(49,43,78,.92),rgba(25,29,42,.96))!important;color:#e7e2ff!important;font-size:9px!important;letter-spacing:.1px;box-shadow:0 0 0 1px rgba(151,137,255,.06),0 5px 16px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.05);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.gorbus-account-entry:hover{transform:translateY(-1px);border-color:rgba(171,157,255,.65)!important;box-shadow:0 0 18px rgba(126,107,241,.18),0 8px 20px rgba(0,0,0,.24)}
+.gorbus-account-entry svg{width:14px;height:14px}
+.gorbus-account-indicator{width:6px;height:6px;border-radius:50%;background:#697387;box-shadow:0 0 0 3px rgba(105,115,135,.13)}
+.gorbus-account-indicator.is-connected{background:#75ddb2;box-shadow:0 0 0 3px rgba(117,221,178,.13),0 0 11px rgba(117,221,178,.7)}
+.gorbus-account-entry.is-connected{border-color:rgba(92,184,147,.35)!important}
+.gorbus-account-backdrop{position:fixed;inset:0;z-index:10020;display:grid;place-items:center;padding:18px;background:rgba(5,7,13,.72);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px)}
+.gorbus-account-backdrop[hidden]{display:none}
+.gorbus-account-dialog{width:min(540px,100%);max-height:min(780px,calc(100dvh - 34px));display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(165,153,220,.2);border-radius:16px;background:radial-gradient(ellipse at 85% -10%,rgba(119,96,226,.18),transparent 42%),linear-gradient(165deg,#1c202c,#141821 67%);color:#e8eaf2;box-shadow:0 30px 100px rgba(0,0,0,.62),0 0 45px rgba(112,92,215,.12),inset 0 1px rgba(255,255,255,.045);animation:gorbusAccountIn .22s ease-out}
+@keyframes gorbusAccountIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.gorbus-account-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 15px;border-bottom:1px solid rgba(143,151,174,.13);background:linear-gradient(90deg,rgba(255,255,255,.025),transparent 56%)}
+.gorbus-account-heading{display:flex;align-items:center;gap:12px}
+.gorbus-account-mark{width:39px;height:39px;display:grid;place-items:center;border:1px solid rgba(164,150,255,.28);border-radius:11px;background:linear-gradient(140deg,rgba(129,109,237,.25),rgba(46,57,79,.45));color:#c8beff;box-shadow:0 0 20px rgba(129,109,237,.13)}
+.gorbus-account-mark svg{width:19px;height:19px}
+.gorbus-account-heading h2{margin:0;color:#f1f0f8;font-size:15px;font-weight:650;letter-spacing:-.3px}
+.gorbus-account-heading p{margin:4px 0 0;color:#8e98ac;font-size:10px}
+.gorbus-account-close,.gorbus-icon-button{display:grid;place-items:center;width:31px;height:31px;border:1px solid rgba(143,151,174,.17);border-radius:8px;background:rgba(255,255,255,.025);color:#aab3c5;cursor:pointer}
+.gorbus-account-close:hover,.gorbus-icon-button:hover{border-color:rgba(162,146,255,.43);background:rgba(128,108,224,.11);color:#eeeaff}
+.gorbus-account-close svg,.gorbus-icon-button svg{width:15px;height:15px}
+.gorbus-account-content{overflow:auto;padding:16px 19px 18px;scrollbar-width:thin;scrollbar-color:#45415e transparent}
+.gorbus-account-profile{display:flex;align-items:center;gap:11px;margin-bottom:15px;padding:10px 11px;border:1px solid rgba(142,152,174,.13);border-radius:10px;background:rgba(255,255,255,.025)}
+.gorbus-account-avatar{width:38px;height:38px;display:grid;place-items:center;flex:none;overflow:hidden;border:1px solid rgba(160,148,220,.22);border-radius:50%;background:linear-gradient(135deg,#3b3655,#25354a);color:#c9c1ff}
+.gorbus-account-avatar svg{width:18px;height:18px}
+.gorbus-account-avatar img{width:100%;height:100%;object-fit:cover}
+.gorbus-account-identity{min-width:0;display:grid;gap:4px;flex:1}
+.gorbus-account-identity strong{overflow:hidden;color:#e8eaf2;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+.gorbus-account-identity span{color:#8792a7;font-size:9px}
+.gorbus-account-status{padding:5px 8px;border:1px solid rgba(140,148,167,.15);border-radius:20px;background:rgba(255,255,255,.025);color:#9099ab;font-size:8px;letter-spacing:.5px}
+.gorbus-account-status.is-connected{border-color:rgba(101,202,162,.22);background:rgba(72,166,127,.09);color:#91dabb}
+.gorbus-usage-card{padding:14px;border:1px solid rgba(150,139,220,.18);border-radius:12px;background:radial-gradient(ellipse at 90% 0%,rgba(116,96,224,.13),transparent 55%),linear-gradient(145deg,rgba(34,39,55,.96),rgba(25,30,42,.96));box-shadow:inset 0 1px rgba(255,255,255,.04)}
+.gorbus-usage-heading,.gorbus-section-heading{display:flex;align-items:center;justify-content:space-between}
+.gorbus-eyebrow,.gorbus-section-heading span{color:#8f84d0;font-size:8px;letter-spacing:1.15px;font-weight:700}
+.gorbus-usage-heading h3,.gorbus-section-heading h3{margin:3px 0 0;color:#edecf5;font-size:13px;font-weight:620}
+.gorbus-usage-numbers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:17px 0 12px}
+.gorbus-usage-numbers>div{display:grid;gap:5px}
+.gorbus-usage-numbers span{color:#9ba5b6;font-size:9px}
+.gorbus-usage-numbers strong{color:#f0effa;font-size:19px;font-weight:650;letter-spacing:-.45px;font-variant-numeric:tabular-nums}
+.gorbus-usage-numbers>div:first-child strong{color:#b4aaff}
+.gorbus-usage-track{height:7px;overflow:hidden;border-radius:10px;background:rgba(7,10,17,.75);box-shadow:inset 0 1px 3px rgba(0,0,0,.4)}
+.gorbus-usage-track span{display:block;width:0;height:100%;border-radius:10px;background:linear-gradient(90deg,#7561d8,#92b7ff);box-shadow:0 0 12px rgba(139,118,246,.45);transition:width .5s ease}
+.gorbus-usage-foot{display:flex;justify-content:space-between;gap:8px;margin-top:8px;color:#8d99ad;font-size:8px}
+.gorbus-account-note{margin:12px 0 0;color:#7f8a9e;font-size:9px;line-height:1.55}
+.gorbus-account-details{margin-top:17px}
+.gorbus-section-heading{margin-bottom:8px}
+.gorbus-section-heading h3{margin:0}
+.gorbus-section-heading span{color:#77849a;font-size:7px}
+.gorbus-usage-list{display:grid;gap:5px}
+.gorbus-usage-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:9px 10px;border:1px solid rgba(141,151,173,.1);border-radius:7px;background:rgba(255,255,255,.022)}
+.gorbus-usage-row span{overflow:hidden;color:#c4cbd8;font-size:9px;text-transform:capitalize;text-overflow:ellipsis;white-space:nowrap}
+.gorbus-usage-row small{color:#7d899d;font-size:8px}
+.gorbus-usage-row strong{color:#a89af2;font-size:9px;font-weight:600;font-variant-numeric:tabular-nums}
+.gorbus-usage-empty{padding:12px;border:1px dashed rgba(139,151,174,.18);border-radius:8px;color:#8590a4;text-align:center;font-size:9px}
+.gorbus-account-model{display:flex;align-items:center;gap:10px;margin-top:15px;padding:10px;border:1px solid rgba(144,133,203,.16);border-radius:9px;background:rgba(102,88,181,.055)}
+.gorbus-model-icon{width:31px;height:31px;display:grid;place-items:center;border-radius:8px;background:rgba(126,108,220,.15);color:#c3b9ff}
+.gorbus-model-icon svg{width:16px;height:16px}
+.gorbus-account-model>div:nth-child(2){display:grid;gap:3px;flex:1}
+.gorbus-account-model>div:nth-child(2)>span{color:#8e83ce;font-size:7px;letter-spacing:.9px}
+.gorbus-account-model strong{color:#e6e5f1;font-size:10px}
+.gorbus-account-model small{color:#8290a4;font-size:8px}
+.gorbus-model-fixed{padding:4px 6px;border:1px solid rgba(147,131,230,.2);border-radius:4px;color:#a79ae9;font-size:7px;letter-spacing:.5px}
+.gorbus-account-feedback{min-height:14px;margin:8px 2px 0;color:#8b9baf;font-size:9px}
+.gorbus-account-feedback.is-error{color:#f0a29b}
+.gorbus-account-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 19px;border-top:1px solid rgba(143,151,174,.13);background:rgba(9,12,19,.25)}
+.gorbus-account-footer-links a{display:inline-flex;align-items:center;gap:5px;color:#a7a0d8;font-size:9px;text-decoration:none}
+.gorbus-account-footer-links a:hover{color:#e1dcff}
+.gorbus-account-footer-links svg{width:11px;height:11px}
+.gorbus-account-actions{display:flex;gap:7px}
+.gorbus-account-switch,.gorbus-account-signout{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:30px;padding:0 9px;border:1px solid rgba(150,145,176,.2);border-radius:7px;background:rgba(255,255,255,.035);color:#c4cad7;font-size:8px;cursor:pointer}
+.gorbus-account-switch:hover{border-color:rgba(150,135,255,.4);background:rgba(128,108,224,.1);color:#e9e5ff}
+.gorbus-account-signout{border-color:rgba(201,127,127,.2);color:#d8a4a4}
+.gorbus-account-signout:hover{border-color:rgba(225,126,126,.45);background:rgba(180,75,75,.09);color:#ffd0d0}
+.gorbus-account-signout svg{width:12px;height:12px}
+.gorbus-account-actions button:disabled{opacity:.42;cursor:not-allowed}
+.gorbus-ai-workflow{padding:10px 13px 9px;border-bottom:1px solid rgba(140,150,174,.1);background:radial-gradient(ellipse at 8% 0%,rgba(111,94,219,.1),transparent 58%),rgba(18,23,33,.93)}
+.gorbus-ai-workflow-head{display:flex;align-items:center;gap:9px}
+.gorbus-ai-workflow-orb{width:26px;height:26px;display:grid;place-items:center;border:1px solid rgba(153,138,246,.25);border-radius:8px;background:rgba(121,103,224,.13);color:#b5a8ff}
+.gorbus-ai-workflow-orb svg{width:14px;height:14px}
+.gorbus-ai-workflow-head>div{display:grid;gap:3px;flex:1}
+.gorbus-ai-workflow-head strong{color:#dfe3ed;font-size:9px;font-weight:650}
+.gorbus-ai-workflow-head small{color:#8591a5;font-size:8px}
+.gorbus-ai-workflow-state{color:#969ab1;font:7px var(--mono);letter-spacing:.7px}
+.gorbus-ai-workflow.is-working .gorbus-ai-workflow-orb{animation:gorbusOrbPulse 1.4s ease-in-out infinite}
+@keyframes gorbusOrbPulse{50%{box-shadow:0 0 17px rgba(143,121,247,.35);transform:scale(1.05)}}
+.gorbus-ai-workflow-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:9px 0 0 35px}
+.gorbus-ai-workflow-steps span{display:flex;align-items:center;gap:4px;color:#748197;font-size:7px}
+.gorbus-ai-workflow-steps i{width:14px;height:14px;display:grid;place-items:center;border:1px solid #3b4352;border-radius:50%;color:#7d899c;font:7px var(--mono);font-style:normal}
+.gorbus-ai-workflow-steps span.is-active{color:#d1c8ff}
+.gorbus-ai-workflow-steps span.is-active i{border-color:#907ef2;background:rgba(126,106,228,.18);color:#e4ddff;box-shadow:0 0 10px rgba(133,113,236,.18)}
+.gorbus-ai-workflow-steps span.is-done{color:#8fceaf}
+.gorbus-ai-workflow-steps span.is-done i{border-color:rgba(98,192,146,.5);background:rgba(75,168,126,.13);color:#9fe0bf}
+.gorbus-ai-preflight{display:inline-flex;align-items:center;justify-content:center;min-height:29px;padding:0 10px;border:1px solid rgba(137,124,224,.3);border-radius:6px;background:linear-gradient(135deg,rgba(91,79,159,.22),rgba(39,44,63,.7));color:#cec7ff;font-size:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.gorbus-ai-preflight:hover{border-color:rgba(157,143,255,.65);background:rgba(110,94,198,.19)}
+.gorbus-ai-preflight:disabled{opacity:.55;cursor:wait}
+.gorbus-ai-preflight.is-success{border-color:rgba(94,187,145,.4);color:#9cdbbd}
+.gorbus-ai-preflight.is-error{border-color:rgba(224,128,128,.45);color:#e9a2a2}
+.gorbus-polished-ui .toolbar,.gorbus-polished-ui .panel-heading{background-image:linear-gradient(100deg,rgba(130,113,233,.035),transparent 56%)}
+.gorbus-polished-ui .panel{box-shadow:inset 0 1px rgba(255,255,255,.022),1px 0 rgba(0,0,0,.12)}
+.gorbus-polished-ui .panel-heading{border-bottom-color:rgba(153,162,183,.13)}
+.gorbus-polished-ui .tool-btn.active{box-shadow:0 0 0 1px rgba(158,145,255,.38),0 0 18px rgba(132,112,235,.16),inset 0 1px rgba(255,255,255,.1)}
+.gorbus-polished-ui :focus-visible{outline:2px solid rgba(165,151,255,.9)!important;outline-offset:2px}
+.gorbus-polished-ui .gorbus-ai-window{box-shadow:0 26px 90px rgba(0,0,0,.62),0 0 50px rgba(109,93,207,.14),inset 0 1px rgba(255,255,255,.06)}
+@media(max-width:600px){
+  .gorbus-account-backdrop{padding:8px}
+  .gorbus-account-dialog{max-height:calc(100dvh - 16px);border-radius:12px}
+  .gorbus-account-header,.gorbus-account-content,.gorbus-account-footer{padding-left:12px;padding-right:12px}
+  .gorbus-usage-numbers strong{font-size:16px}
+  .gorbus-account-footer{align-items:flex-start;flex-direction:column}
+  .gorbus-account-actions{width:100%}
+  .gorbus-account-actions button{flex:1}
+  .gorbus-ai-workflow-steps{margin-left:0}
+  .gorbus-ai-workflow-steps span{font-size:6px}
+}
+@media(prefers-reduced-motion:reduce){
+  .gorbus-account-dialog,.gorbus-account-entry,.gorbus-ai-workflow-orb,.gorbus-usage-track span{animation:none!important;transition:none!important}
+}
