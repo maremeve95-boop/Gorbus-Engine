@@ -178,5 +178,66 @@ for (const [relativePath, content] of Object.entries(gePatchBundle)) {
   writeFileSync(target, content);
 }
 await import('./ge101-prepare.mjs');
+main = readFileSync(mainPath, 'utf8');
+html = readFileSync(htmlPath, 'utf8');
 
-console.log('Gorbus Engine GE 1.0.1 sources restored, Rapier events and editor upgrades applied.');
+// Final correctness fixes for GE 1.0.1 (applied after source restoration on every build).
+function replaceBuildOnce(source, oldText, newText, description) {
+  const first = source.indexOf(oldText);
+  if (first < 0) throw new Error('GE 1.0.1 build patch could not find: ' + description);
+  if (source.indexOf(oldText, first + oldText.length) >= 0) throw new Error('GE 1.0.1 build patch found duplicate anchor: ' + description);
+  return source.slice(0, first) + newText + source.slice(first + oldText.length);
+}
+
+// A Collider by itself must remain static. Only adding a Rigidbody makes it dynamic.
+main = replaceBuildOnce(main,
+  "if(['Rigidbody','Box Collider','Sphere Collider'].includes(name))selected.userData.physics=selected.userData.physics||{type:'dynamic',friction:0.7,restitution:0.15};",
+  "if(name==='Rigidbody'){const current=selected.userData.physics||{};selected.userData.physics={...current,type:'dynamic',friction:current.friction??0.7,restitution:current.restitution??0.15};}else if(['Box Collider','Sphere Collider'].includes(name)){const current=selected.userData.physics||{};selected.userData.physics={...current,type:current.type||'fixed',friction:current.friction??0.7,restitution:current.restitution??0.15};}",
+  'Collider-only bodies stay fixed'
+);
+
+// Preserve UUIDs in scene files so Button + Door links survive save/reopen and Undo/Redo.
+main = replaceBuildOnce(main,
+  "return {name:labelOf(obj),kind:kindOf(obj),type:obj.userData.gorbusType||'OBJECT',position:obj.position.toArray()",
+  "return {uuid:obj.uuid,name:labelOf(obj),kind:kindOf(obj),type:obj.userData.gorbusType||'OBJECT',position:obj.position.toArray()",
+  'scene serialization UUID'
+);
+main = replaceBuildOnce(main,
+  "obj.position.fromArray(item.position||[0,.6,0]);obj.rotation.set(",
+  "if(typeof item.uuid==='string'&&item.uuid.length<=64&&!editable.some(existing=>existing.uuid===item.uuid))obj.uuid=item.uuid;obj.position.fromArray(item.position||[0,.6,0]);obj.rotation.set(",
+  'scene restoration UUID'
+);
+
+// Use exact zero direction components in raycasts instead of treating zero as a missing value.
+main = replaceBuildOnce(main,
+  "const direction=new THREE.Vector3(Number(dx)||0,Number(dy)||0,Number(dz)||-1);\n      if(direction.lengthSq()<1e-8)return null;direction.normalize();\n      const hit=physicsWorld.castRay(new RAPIER.Ray(origin,direction),Math.max(.01,Number(maxDistance)||100),true);",
+  "const rawDirection=[Number(dx),Number(dy),Number(dz)];const direction=new THREE.Vector3(...rawDirection.map((value,index)=>Number.isFinite(value)?value:(index===2?-1:0)));\n      if(direction.lengthSq()<1e-8)return null;direction.normalize();\n      const requestedDistance=Number(maxDistance);const hit=physicsWorld.castRay(new RAPIER.Ray(origin,direction),Number.isFinite(requestedDistance)&&requestedDistance>0?requestedDistance:100,true);",
+  'raycast zero-vector handling'
+);
+
+// Expose the active-pair map so a collected sensor can release its overlap state immediately.
+main = replaceBuildOnce(main,
+  "get physicsColliderObjects(){return physicsColliderObjects;},get RAPIER(){return RAPIER;}",
+  "get physicsColliderObjects(){return physicsColliderObjects;},get activePhysicsPairs(){return activePhysicsPairs;},get RAPIER(){return RAPIER;}",
+  'active physics pairs bridge'
+);
+writeFileSync(mainPath, main);
+
+// A Falling Platform should fall when a dynamic object steps on it, not when it merely touches static scenery.
+const gePath = resolve('src/ge101.js');
+let geSource = readFileSync(gePath, 'utf8');
+geSource = replaceBuildOnce(geSource,
+  "    if (started) {\n      for (const candidate of [a, b]) {\n        if (candidate?.userData.prefabType === 'falling-platform') {\n          const body = engine.physicsBodies.get(candidate.uuid);\n          if (body && engine.RAPIER?.RigidBodyType?.Dynamic !== undefined) {\n            body.setBodyType(engine.RAPIER.RigidBodyType.Dynamic, true);\n            candidate.userData.physics = { ...(candidate.userData.physics || {}), type: 'dynamic' };\n          }\n        }\n      }\n    }",
+  "    if (started) {\n      for (const candidate of [a, b]) {\n        if (candidate?.userData.prefabType === 'falling-platform') {\n          const other = candidate === a ? b : a;\n          const otherBody = engine.physicsBodies.get(other?.uuid);\n          const otherIsDynamic = Boolean(otherBody && (typeof otherBody.isDynamic === 'function' ? otherBody.isDynamic() : other.userData.physics?.type === 'dynamic'));\n          const body = engine.physicsBodies.get(candidate.uuid);\n          if (otherIsDynamic && body && engine.RAPIER?.RigidBodyType?.Dynamic !== undefined) {\n            body.setBodyType(engine.RAPIER.RigidBodyType.Dynamic, true);\n            body.wakeUp?.();\n            candidate.userData.physics = { ...(candidate.userData.physics || {}), type: 'dynamic' };\n          }\n        }\n      }\n    }",
+  'Falling Platform activation filter'
+);
+
+// Remove a collected coin from the active overlap set as well as the collider maps.
+geSource = replaceBuildOnce(geSource,
+  "for (const [handle, owner] of engine.physicsColliderObjects || []) { if (owner === trigger) engine.physicsColliderObjects.delete(handle); }\n        engine.physicsBodies.delete(trigger.uuid);",
+  "for (const [handle, owner] of engine.physicsColliderObjects || []) { if (owner === trigger) engine.physicsColliderObjects.delete(handle); }\n        for (const [key, pair] of engine.activePhysicsPairs || []) { if (pair.a === trigger || pair.b === trigger) engine.activePhysicsPairs.delete(key); }\n        engine.physicsBodies.delete(trigger.uuid);",
+  'collected coin pair cleanup'
+);
+writeFileSync(gePath, geSource);
+
+console.log('Gorbus Engine GE 1.0.1 sources restored; physics, cameras, prefabs, history and persistence fixes applied.');
