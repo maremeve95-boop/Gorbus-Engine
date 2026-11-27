@@ -50,6 +50,7 @@ export function patchGorbusMain(input) {
     '- Gorbus.setCameraMode(mode, duration) admite orbit, third-person, top-down, first-person y game; Gorbus.cameraTo(...) interpola una cámara.\n- Gorbus.lockMouse(boolean) solicita o libera Pointer Lock durante Play; algunos navegadores pueden pedir un clic adicional del usuario.\n- Gorbus.getMouseDelta() devuelve una tabla {x, y} con el movimiento del ratón en píxeles desde la última lectura.\n- Gorbus.setCameraPosition(x, y, z) coloca la cámara del juego; Gorbus.setCameraRotation(x, y, z) establece su Euler en radianes (orden YXZ: pitch, yaw, roll).\n- Gorbus.getObjectPosition(name) devuelve {x, y, z} de la posición actual del objeto, usando la posición del cuerpo Rapier si tiene Rigidbody.\n- Un objeto con el componente Camera se activa automáticamente como cámara de juego al pulsar Play.\n- Luau incluye math.sin, math.cos y math.rad; no uses Vector3 ni APIs de Roblox.\n',
     'Gorbus AI API documentation for game camera and math'
   );
+  main = main.replaceAll('Gorbus Engine 1.0.1', 'Gorbus Engine 1.0.3').replaceAll('GE 1.0.1 — FLUJO DE TRABAJO DE JUEGOS', 'GE 1.0.3 — FLUJO DE TRABAJO DE JUEGOS');
   return main;
 }
 
@@ -158,6 +159,7 @@ export function patchGorbusGE101(input) {
     'window.GorbusGE101 = { state, setCameraMode, createPrefab, undo, redo, createTerrain, enableBloom, lockMouse, consumeMouseDelta, setGameCameraPosition, setGameCameraRotation, beginPlay, endPlay };',
     'export camera and input methods'
   );
+  ge = ge.replaceAll('GE 1.0.1', 'GE 1.0.3');
   return ge;
 }
 
