@@ -63,6 +63,10 @@ Estas funciones son objetivos de desarrollo, no capacidades que GE 2.0.0 ya prom
 3. Usa el botón de importar modelo del editor. Límite: 30 MB por archivo.
 4. Guarda el proyecto como `.gorbus` para conservar el modelo dentro del proyecto.
 
+## Cómo se restauran las fuentes de GE 2.0.0
+
+El repositorio conserva el sistema de capas comprimidas que ya utilizaba el proyecto. El código de GE 2.0.0 se almacena en `build-assets/ge200-overlay-*.br64`; `prepare.mjs` concatena los diez fragmentos, valida el SHA-256 del archivo comprimido y restaura únicamente las rutas permitidas antes de aplicar las mejoras al editor. Así, `npm run dev`, `npm run check` y `npm run build` parten de las mismas fuentes restauradas. No edites los fragmentos a mano: cambia el archivo fuente restaurado, actualiza el overlay y su hash como una única operación.
+
 ## Ejecutar localmente
 
 Requisitos: Node.js `>=20.19` (se recomienda Node 22) y conexión a Internet para instalar dependencias.
