@@ -7,20 +7,20 @@ local PLAYER = "Stryde_Player"
 local ROUND_SECONDS = 60
 local MOUSE_SENSITIVITY = 0.0022
 
-local weapons = {
-    { name = "S-9 PULSE", damage = 25, interval = 0.11 },
-    { name = "K-2 AURA", damage = 40, interval = 0.22 },
-    { name = "BREAKER-8", damage = 18, interval = 0.48 },
-    { name = "LANCE-X", damage = 100, interval = 0.85 },
+local scanModes = {
+    { name = "ORBITAL", points = 25, interval = 0.11 },
+    { name = "LUMEN", points = 40, interval = 0.22 },
+    { name = "ECHO", points = 55, interval = 0.48 },
+    { name = "PRISM", points = 75, interval = 0.85 },
 }
 
-local targets = {
-    { name = "Stryde_Target_01", x = -9, y = 1.35, z = -7, moving = true, range = 2.2, speed = 1.1, phase = 0.0, health = 100, respawn = 0, moveClock = 0 },
-    { name = "Stryde_Target_02", x = -5, y = 1.35, z = -10, moving = false, range = 0, speed = 0, phase = 0.8, health = 100, respawn = 0, moveClock = 0 },
-    { name = "Stryde_Target_03", x = 0, y = 1.35, z = -8, moving = true, range = 2.8, speed = 1.5, phase = 1.6, health = 100, respawn = 0, moveClock = 0 },
-    { name = "Stryde_Target_04", x = 5, y = 1.35, z = -10, moving = false, range = 0, speed = 0, phase = 2.4, health = 100, respawn = 0, moveClock = 0 },
-    { name = "Stryde_Target_05", x = 9, y = 1.35, z = -7, moving = true, range = 2.0, speed = 1.25, phase = 3.2, health = 100, respawn = 0, moveClock = 0 },
-    { name = "Stryde_Target_06", x = 0, y = 1.35, z = -13, moving = false, range = 0, speed = 0, phase = 4.0, health = 100, respawn = 0, moveClock = 0 },
+local beacons = {
+    { name = "Stryde_Beacon_01", x = -9, y = 1.35, z = -7, moving = true, range = 2.2, speed = 1.1, phase = 0.0, respawn = 0, moveClock = 0 },
+    { name = "Stryde_Beacon_02", x = -5, y = 1.35, z = -10, moving = false, range = 0, speed = 0, phase = 0.8, respawn = 0, moveClock = 0 },
+    { name = "Stryde_Beacon_03", x = 0, y = 1.35, z = -8, moving = true, range = 2.8, speed = 1.5, phase = 1.6, respawn = 0, moveClock = 0 },
+    { name = "Stryde_Beacon_04", x = 5, y = 1.35, z = -10, moving = false, range = 0, speed = 0, phase = 2.4, respawn = 0, moveClock = 0 },
+    { name = "Stryde_Beacon_05", x = 9, y = 1.35, z = -7, moving = true, range = 2.0, speed = 1.25, phase = 3.2, respawn = 0, moveClock = 0 },
+    { name = "Stryde_Beacon_06", x = 0, y = 1.35, z = -13, moving = false, range = 0, speed = 0, phase = 4.0, respawn = 0, moveClock = 0 },
 }
 
 local yaw = 0
@@ -28,12 +28,12 @@ local pitch = 0
 local elapsed = 0
 local remaining = ROUND_SECONDS
 local score = 0
-local shots = 0
-local hits = 0
-local eliminations = 0
-local weaponIndex = 1
-local fireCooldown = 0
-local targetUpdateClock = 0
+local scans = 0
+local successfulScans = 0
+local activatedNodes = 0
+local scanModeIndex = 1
+local scanCooldown = 0
+local beaconUpdateClock = 0
 local active = true
 local finished = false
 local lastTimeNotice = 60
@@ -48,42 +48,41 @@ local function directionFromAngles(): (number, number, number)
     return -math.sin(yaw) * cosPitch, math.sin(pitch), -math.cos(yaw) * cosPitch
 end
 
-local function targetByName(name: string)
-    for _, target in ipairs(targets) do
-        if target.name == name then
-            return target
+local function beaconByName(name: string)
+    for _, beacon in ipairs(beacons) do
+        if beacon.name == name then
+            return beacon
         end
     end
     return nil
 end
 
-local function resetTarget(target)
-    target.health = 100
-    target.respawn = 0
-    target.moveClock = 0
-    Gorbus.setPosition(target.name, target.x, target.y, target.z)
-    Gorbus.setColor(target.name, "#a8dcff")
+local function resetBeacon(beacon)
+    beacon.respawn = 0
+    beacon.moveClock = 0
+    Gorbus.setPosition(beacon.name, beacon.x, beacon.y, beacon.z)
+    Gorbus.setColor(beacon.name, "#a8dcff")
 end
 
 local function accuracyPercent(): number
-    if shots <= 0 then return 0 end
-    return math.floor((hits / shots) * 100 + 0.5)
+    if scans <= 0 then return 0 end
+    return math.floor((successfulScans / scans) * 100 + 0.5)
 end
 
 local function updateHUD(rank: string?)
-    Gorbus.setGameHUD(remaining, score, accuracyPercent(), weapons[weaponIndex].name, eliminations, rank or "--")
+    Gorbus.setGameHUD(remaining, score, accuracyPercent(), scanModes[scanModeIndex].name, activatedNodes, rank or "--")
 end
 
 local function resetRound()
     elapsed = 0
     remaining = ROUND_SECONDS
     score = 0
-    shots = 0
-    hits = 0
-    eliminations = 0
-    weaponIndex = 1
-    fireCooldown = 0
-    targetUpdateClock = 0
+    scans = 0
+    successfulScans = 0
+    activatedNodes = 0
+    scanModeIndex = 1
+    scanCooldown = 0
+    beaconUpdateClock = 0
     active = true
     finished = false
     lastTimeNotice = ROUND_SECONDS
@@ -92,8 +91,8 @@ local function resetRound()
     updateHUD("--")
     Gorbus.showGameMessage("CAMPO ORIÓN · NUEVA RONDA")
 
-    for _, target in ipairs(targets) do
-        resetTarget(target)
+    for _, beacon in ipairs(beacons) do
+        resetBeacon(beacon)
     end
 
     local player = Gorbus.getObjectPosition(PLAYER)
@@ -102,7 +101,7 @@ local function resetRound()
         Gorbus.setVelocity(PLAYER, 0, 0, 0)
     end
 
-    Gorbus.log("STRYDE · NUEVA RONDA | 60 segundos | munición infinita")
+    Gorbus.log("STRYDE · NUEVA RONDA | 60 segundos | escaneos ilimitados")
 end
 
 local function finishRound()
@@ -128,31 +127,31 @@ local function finishRound()
 
     Gorbus.log("════════ STRYDE · RESULTADOS ════════")
     Gorbus.log("PUNTUACIÓN: " .. tostring(score) .. " | RANGO: " .. rank)
-    Gorbus.log("IMPACTOS: " .. tostring(hits) .. " / " .. tostring(shots) .. " | PRECISIÓN: " .. tostring(accuracy) .. "%")
-    Gorbus.log("OBJETIVOS: " .. tostring(eliminations) .. " eliminados")
+    Gorbus.log("ESCANEOS CORRECTOS: " .. tostring(successfulScans) .. " / " .. tostring(scans) .. " | PRECISIÓN: " .. tostring(accuracy) .. "%")
+    Gorbus.log("BALIZAS: " .. tostring(activatedNodes) .. " activadas")
     Gorbus.log("Pulsa T para repetir el entrenamiento.")
 end
 
-local function updateTargets(dt: number)
-    targetUpdateClock += dt
-    for _, target in ipairs(targets) do
-        if target.respawn > 0 then
-            target.respawn = math.max(0, target.respawn - dt)
-            if target.respawn == 0 then
-                resetTarget(target)
+local function updateBeacons(dt: number)
+    beaconUpdateClock += dt
+    for _, beacon in ipairs(beacons) do
+        if beacon.respawn > 0 then
+            beacon.respawn = math.max(0, beacon.respawn - dt)
+            if beacon.respawn == 0 then
+                resetBeacon(beacon)
             end
-        elseif target.moving and targetUpdateClock >= 0.06 then
-            local offset = math.sin(elapsed * target.speed + target.phase) * target.range
-            Gorbus.setPosition(target.name, target.x + offset, target.y, target.z)
+        elseif beacon.moving and beaconUpdateClock >= 0.06 then
+            local offset = math.sin(elapsed * beacon.speed + beacon.phase) * beacon.range
+            Gorbus.setPosition(beacon.name, beacon.x + offset, beacon.y, beacon.z)
         end
     end
-    if targetUpdateClock >= 0.06 then
-        targetUpdateClock = 0
+    if beaconUpdateClock >= 0.06 then
+        beaconUpdateClock = 0
     end
 end
 
-local function fireShot()
-    local weapon = weapons[weaponIndex]
+local function sendScanPulse()
+    local scanMode = scanModes[scanModeIndex]
     local player = Gorbus.getObjectPosition(PLAYER)
     if not player then
         return
@@ -166,35 +165,28 @@ local function fireShot()
     local originZ = player.z + dz * 0.95
     local result = Gorbus.raycast(originX, originY, originZ, dx, dy, dz, 85)
 
-    shots += 1
-    fireCooldown = weapon.interval
+    scans += 1
+    scanCooldown = scanMode.interval
 
     if not result then
         return
     end
 
-    local target = targetByName(result.name)
-    if not target or target.respawn > 0 then
+    local beacon = beaconByName(result.name)
+    if not beacon or beacon.respawn > 0 then
         return
     end
 
-    hits += 1
+    successfulScans += 1
     score += 25
-    target.health -= weapon.damage
 
-    if target.health <= 0 then
-        eliminations += 1
-        score += 75
-        target.respawn = 1.7
-        Gorbus.setPosition(target.name, target.x, -35, target.z)
-        Gorbus.setColor(target.name, "#4a5664")
-        Gorbus.showGameMessage("OBJETIVO ELIMINADO · +100")
-        Gorbus.log("OBJETIVO DESTRUIDO · +100 · TOTAL " .. tostring(score))
-    else
-        Gorbus.setColor(target.name, "#ff9b55")
-        Gorbus.showGameMessage("IMPACTO · +25")
-        Gorbus.log("IMPACTO · " .. result.name .. " · " .. tostring(math.max(0, target.health)) .. "%")
-    end
+    activatedNodes += 1
+    score += scanMode.points
+    beacon.respawn = 1.7
+    Gorbus.setPosition(beacon.name, beacon.x, -35, beacon.z)
+    Gorbus.setColor(beacon.name, "#4a5664")
+    Gorbus.showGameMessage("BALIZA ACTIVADA · +" .. tostring(scanMode.points))
+    Gorbus.log("BALIZA ACTIVADA · " .. result.name .. " · TOTAL " .. tostring(score))
 end
 
 function onStart()
@@ -204,9 +196,9 @@ function onStart()
         return
     end
 
-    for _, target in ipairs(targets) do
-        if not Gorbus.find(target.name) then
-            Gorbus.log("ERROR STRYDE: falta el objetivo " .. target.name)
+    for _, beacon in ipairs(beacons) do
+        if not Gorbus.find(beacon.name) then
+            Gorbus.log("ERROR STRYDE: falta el objetivo " .. beacon.name)
             active = false
             return
         end
@@ -215,7 +207,7 @@ function onStart()
     -- La física ya fue construida antes de onStart; ocultamos solo el modelo visual
     -- para evitar que la cápsula del jugador tape la cámara en primera persona.
     Gorbus.setObjectVisible(PLAYER, false)
-    Gorbus.setGameHUD(ROUND_SECONDS, score, 0, weapons[weaponIndex].name, eliminations, "--")
+    Gorbus.setGameHUD(ROUND_SECONDS, score, 0, scanModes[scanModeIndex].name, activatedNodes, "--")
     Gorbus.showGameMessage("CAMPO ORIÓN · ENTRENAMIENTO")
     Gorbus.setCameraMode("game", 0.1)
     Gorbus.lockMouse(true)
@@ -227,8 +219,8 @@ function onStart()
 
     Gorbus.log("STRYDE · CAMPO ORIÓN · PORT 0.1")
     Gorbus.log("WASD mover · Shift correr · Espacio saltar · Ratón mirar")
-    Gorbus.log("Clic izq. disparar · Clic der. apuntar · 1–4 cambiar arma · T reiniciar")
-    Gorbus.log("ENTRENAMIENTO: 60 s, objetivos móviles y munición infinita.")
+    Gorbus.log("Clic izq. escanear · Clic der. estabilizar · 1–4 modos de escaneo · T reiniciar")
+    Gorbus.log("ENTRENAMIENTO: 60 s, seis balizas y tres móviles; escaneos ilimitados.")
 end
 
 function onUpdate(dt: number)
@@ -273,19 +265,19 @@ function onUpdate(dt: number)
     Gorbus.setCameraRotation(pitch, yaw, 0)
     Gorbus.controlCharacter(speed, 6.8, PLAYER)
 
-    if Gorbus.isKeyJustPressed("1") then weaponIndex = 1; Gorbus.showGameMessage("ARMA · " .. weapons[weaponIndex].name); Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
-    if Gorbus.isKeyJustPressed("2") then weaponIndex = 2; Gorbus.showGameMessage("ARMA · " .. weapons[weaponIndex].name); Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
-    if Gorbus.isKeyJustPressed("3") then weaponIndex = 3; Gorbus.showGameMessage("ARMA · " .. weapons[weaponIndex].name); Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
-    if Gorbus.isKeyJustPressed("4") then weaponIndex = 4; Gorbus.showGameMessage("ARMA · " .. weapons[weaponIndex].name); Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
+    if Gorbus.isKeyJustPressed("1") then scanModeIndex = 1; Gorbus.showGameMessage("MODO · " .. scanModes[scanModeIndex].name); Gorbus.log("MODO · " .. scanModes[scanModeIndex].name) end
+    if Gorbus.isKeyJustPressed("2") then scanModeIndex = 2; Gorbus.showGameMessage("MODO · " .. scanModes[scanModeIndex].name); Gorbus.log("MODO · " .. scanModes[scanModeIndex].name) end
+    if Gorbus.isKeyJustPressed("3") then scanModeIndex = 3; Gorbus.showGameMessage("MODO · " .. scanModes[scanModeIndex].name); Gorbus.log("MODO · " .. scanModes[scanModeIndex].name) end
+    if Gorbus.isKeyJustPressed("4") then scanModeIndex = 4; Gorbus.showGameMessage("MODO · " .. scanModes[scanModeIndex].name); Gorbus.log("MODO · " .. scanModes[scanModeIndex].name) end
 
-    fireCooldown = math.max(0, fireCooldown - dt)
-    if Gorbus.isMouseButtonDown(0) and fireCooldown <= 0 then
-        fireShot()
+    scanCooldown = math.max(0, scanCooldown - dt)
+    if Gorbus.isMouseButtonDown(0) and scanCooldown <= 0 then
+        sendScanPulse()
     end
 
     elapsed += dt
     remaining = math.max(0, ROUND_SECONDS - elapsed)
-    updateTargets(dt)
+    updateBeacons(dt)
 
     local wholeSeconds = math.floor(remaining)
     if wholeSeconds <= 30 and wholeSeconds % 10 == 0 and wholeSeconds ~= lastTimeNotice then
@@ -295,8 +287,8 @@ function onUpdate(dt: number)
 
     if Gorbus.isKeyJustPressed("tab") then
         local accuracy = 0
-        if shots > 0 then accuracy = math.floor((hits / shots) * 100 + 0.5) end
-        Gorbus.log("MARCADOR · " .. tostring(score) .. " pts · " .. tostring(eliminations) .. " objetivos · " .. tostring(accuracy) .. "% precisión")
+        if scans > 0 then accuracy = math.floor((successfulScans / scans) * 100 + 0.5) end
+        Gorbus.log("MARCADOR · " .. tostring(score) .. " pts · " .. tostring(activatedNodes) .. " balizas · " .. tostring(accuracy) .. "% precisión")
     end
 
     updateHUD("--")
