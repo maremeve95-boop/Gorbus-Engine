@@ -1,0 +1,1109 @@
+{
+  "format": "GorbusScene",
+  "version": 8,
+  "project": "NEON RELAY — 3D Test Game",
+  "mode": "3d",
+  "createdWith": "Gorbus Engine 2.1.0 · Sample Game",
+  "scriptLanguage": "Luau",
+  "luauScript": "--!strict\n-- NEON RELAY — Gorbus Engine 2.1.0 test game\n-- Test coverage: scene loading, capsule physics, first-person camera,\n-- mouse input, keyboard input, proximity gameplay, runtime transforms and HUD.\n\nlocal PLAYER = \"Relay_Player\"\nlocal ROUND_SECONDS = 90\nlocal TOTAL_CORES = 9\nlocal CORE_NAMES = {\n    \"Relay_Core_01\", \"Relay_Core_02\", \"Relay_Core_03\",\n    \"Relay_Core_04\", \"Relay_Core_05\", \"Relay_Core_06\",\n    \"Relay_Core_07\", \"Relay_Core_08\", \"Relay_Core_09\",\n}\n\nlocal elapsed = 0\nlocal remaining = ROUND_SECONDS\nlocal collected = 0\nlocal score = 0\nlocal active = true\nlocal finished = false\nlocal yaw = 0\nlocal pitch = 0\nlocal noticeClock = 0\n\nlocal function clamp(value: number, low: number, high: number): number\n    return math.max(low, math.min(high, value))\nend\n\nlocal function distance(a, b): number\n    local dx = a.x - b.x\n    local dy = a.y - b.y\n    local dz = a.z - b.z\n    return math.sqrt(dx * dx + dy * dy + dz * dz)\nend\n\nlocal function updateHUD()\n    local progress = math.floor((collected / TOTAL_CORES) * 100 + 0.5)\n    Gorbus.setGameHUD(remaining, score, progress, \"NEON RELAY\", collected, collected == TOTAL_CORES and \"S\" or \"--\")\nend\n\nlocal function finishGame(won: boolean)\n    if finished then return end\n    finished = true\n    active = false\n    Gorbus.lockMouse(false)\n    if won then\n        score += math.floor(remaining) * 10\n        Gorbus.showGameMessage(\"¡RELEVO COMPLETADO! · +\" .. tostring(math.floor(remaining) * 10) .. \" BONUS\")\n        Gorbus.log(\"NEON RELAY · VICTORIA · PUNTUACIÓN FINAL: \" .. tostring(score))\n    else\n        Gorbus.showGameMessage(\"TIEMPO AGOTADO · PULSA T PARA REINTENTAR\")\n        Gorbus.log(\"NEON RELAY · TIEMPO AGOTADO · CORES: \" .. tostring(collected) .. \"/\" .. tostring(TOTAL_CORES))\n    end\n    updateHUD()\nend\n\nlocal function resetGame()\n    elapsed = 0\n    remaining = ROUND_SECONDS\n    collected = 0\n    score = 0\n    active = true\n    finished = false\n    yaw = 0\n    pitch = 0\n    noticeClock = 0\n    Gorbus.setPosition(PLAYER, 0, 0.95, 13)\n    Gorbus.setVelocity(PLAYER, 0, 0, 0)\n    for _, name in ipairs(CORE_NAMES) do\n        Gorbus.setObjectVisible(name, true)\n    end\n    updateHUD()\n    Gorbus.showGameMessage(\"NEON RELAY · ¡ENCUENTRA LOS 9 NÚCLEOS!\")\n    Gorbus.lockMouse(true)\nend\n\nfunction onStart()\n    if not Gorbus.find(PLAYER) then\n        Gorbus.log(\"ERROR: falta Relay_Player. Abre el proyecto con Gorbus Engine 2.1.0.\")\n        active = false\n        return\n    end\n    for _, name in ipairs(CORE_NAMES) do\n        if not Gorbus.find(name) then\n            Gorbus.log(\"ERROR: falta el coleccionable \" .. name)\n            active = false\n            return\n        end\n    end\n    Gorbus.setObjectVisible(PLAYER, false)\n    Gorbus.setCameraMode(\"game\", 0.1)\n    Gorbus.setCameraPosition(0, 1.57, 13)\n    Gorbus.setCameraRotation(0, 0, 0)\n    Gorbus.setGameHUD(ROUND_SECONDS, 0, 0, \"NEON RELAY\", 0, \"--\")\n    Gorbus.showGameMessage(\"NEON RELAY · RECOGE LOS 9 NÚCLEOS\")\n    Gorbus.lockMouse(true)\n    Gorbus.log(\"NEON RELAY · CONTROLES: WASD, SHIFT, ESPACIO, RATÓN Y T\")\n    Gorbus.log(\"Recoge los nueve núcleos luminosos antes de que termine el tiempo.\")\nend\n\nfunction onUpdate(dt: number)\n    dt = clamp(dt, 0, 0.05)\n    if Gorbus.isKeyJustPressed(\"t\") then\n        resetGame()\n    end\n    if not active then return end\n\n    local player = Gorbus.getObjectPosition(PLAYER)\n    if not player then\n        active = false\n        Gorbus.lockMouse(false)\n        Gorbus.log(\"ERROR: se ha perdido Relay_Player.\")\n        return\n    end\n\n    local mouse = Gorbus.getMouseDelta()\n    yaw -= (mouse.x or 0) * 0.0022\n    pitch = clamp(pitch - (mouse.y or 0) * 0.0022, -1.3, 1.3)\n    Gorbus.setCameraPosition(player.x, player.y + 0.62, player.z)\n    Gorbus.setCameraRotation(pitch, yaw, 0)\n\n    local speed = Gorbus.isKeyDown(\"shift\") and 9.0 or 6.0\n    Gorbus.controlCharacter(speed, 6.8, PLAYER)\n\n    for _, name in ipairs(CORE_NAMES) do\n        local core = Gorbus.getObjectPosition(name)\n        if core and core.y > -10 and distance(player, core) < 1.65 then\n            Gorbus.setObjectVisible(name, false)\n            Gorbus.setPosition(name, core.x, -30, core.z)\n            collected += 1\n            score += 100\n            Gorbus.showGameMessage(\"NÚCLEO RECOGIDO · +100\")\n            Gorbus.log(\"NÚCLEO \" .. tostring(collected) .. \"/\" .. tostring(TOTAL_CORES) .. \" · PUNTOS \" .. tostring(score))\n            updateHUD()\n        end\n    end\n\n    elapsed += dt\n    remaining = math.max(0, ROUND_SECONDS - elapsed)\n    noticeClock += dt\n    if noticeClock >= 0.2 then\n        updateHUD()\n        noticeClock = 0\n    end\n\n    if collected >= TOTAL_CORES then\n        finishGame(true)\n    elseif remaining <= 0 then\n        finishGame(false)\n    end\nend\n\nfunction onStop()\n    Gorbus.lockMouse(false)\n    Gorbus.setObjectVisible(PLAYER, true)\n    Gorbus.clearGameHUD()\n    Gorbus.log(\"NEON RELAY · SESIÓN FINALIZADA\")\nend\n",
+  "files": {
+    "main.luau": "--!strict\n-- NEON RELAY — Gorbus Engine 2.1.0 test game\n-- Test coverage: scene loading, capsule physics, first-person camera,\n-- mouse input, keyboard input, proximity gameplay, runtime transforms and HUD.\n\nlocal PLAYER = \"Relay_Player\"\nlocal ROUND_SECONDS = 90\nlocal TOTAL_CORES = 9\nlocal CORE_NAMES = {\n    \"Relay_Core_01\", \"Relay_Core_02\", \"Relay_Core_03\",\n    \"Relay_Core_04\", \"Relay_Core_05\", \"Relay_Core_06\",\n    \"Relay_Core_07\", \"Relay_Core_08\", \"Relay_Core_09\",\n}\n\nlocal elapsed = 0\nlocal remaining = ROUND_SECONDS\nlocal collected = 0\nlocal score = 0\nlocal active = true\nlocal finished = false\nlocal yaw = 0\nlocal pitch = 0\nlocal noticeClock = 0\n\nlocal function clamp(value: number, low: number, high: number): number\n    return math.max(low, math.min(high, value))\nend\n\nlocal function distance(a, b): number\n    local dx = a.x - b.x\n    local dy = a.y - b.y\n    local dz = a.z - b.z\n    return math.sqrt(dx * dx + dy * dy + dz * dz)\nend\n\nlocal function updateHUD()\n    local progress = math.floor((collected / TOTAL_CORES) * 100 + 0.5)\n    Gorbus.setGameHUD(remaining, score, progress, \"NEON RELAY\", collected, collected == TOTAL_CORES and \"S\" or \"--\")\nend\n\nlocal function finishGame(won: boolean)\n    if finished then return end\n    finished = true\n    active = false\n    Gorbus.lockMouse(false)\n    if won then\n        score += math.floor(remaining) * 10\n        Gorbus.showGameMessage(\"¡RELEVO COMPLETADO! · +\" .. tostring(math.floor(remaining) * 10) .. \" BONUS\")\n        Gorbus.log(\"NEON RELAY · VICTORIA · PUNTUACIÓN FINAL: \" .. tostring(score))\n    else\n        Gorbus.showGameMessage(\"TIEMPO AGOTADO · PULSA T PARA REINTENTAR\")\n        Gorbus.log(\"NEON RELAY · TIEMPO AGOTADO · CORES: \" .. tostring(collected) .. \"/\" .. tostring(TOTAL_CORES))\n    end\n    updateHUD()\nend\n\nlocal function resetGame()\n    elapsed = 0\n    remaining = ROUND_SECONDS\n    collected = 0\n    score = 0\n    active = true\n    finished = false\n    yaw = 0\n    pitch = 0\n    noticeClock = 0\n    Gorbus.setPosition(PLAYER, 0, 0.95, 13)\n    Gorbus.setVelocity(PLAYER, 0, 0, 0)\n    for _, name in ipairs(CORE_NAMES) do\n        Gorbus.setObjectVisible(name, true)\n    end\n    updateHUD()\n    Gorbus.showGameMessage(\"NEON RELAY · ¡ENCUENTRA LOS 9 NÚCLEOS!\")\n    Gorbus.lockMouse(true)\nend\n\nfunction onStart()\n    if not Gorbus.find(PLAYER) then\n        Gorbus.log(\"ERROR: falta Relay_Player. Abre el proyecto con Gorbus Engine 2.1.0.\")\n        active = false\n        return\n    end\n    for _, name in ipairs(CORE_NAMES) do\n        if not Gorbus.find(name) then\n            Gorbus.log(\"ERROR: falta el coleccionable \" .. name)\n            active = false\n            return\n        end\n    end\n    Gorbus.setObjectVisible(PLAYER, false)\n    Gorbus.setCameraMode(\"game\", 0.1)\n    Gorbus.setCameraPosition(0, 1.57, 13)\n    Gorbus.setCameraRotation(0, 0, 0)\n    Gorbus.setGameHUD(ROUND_SECONDS, 0, 0, \"NEON RELAY\", 0, \"--\")\n    Gorbus.showGameMessage(\"NEON RELAY · RECOGE LOS 9 NÚCLEOS\")\n    Gorbus.lockMouse(true)\n    Gorbus.log(\"NEON RELAY · CONTROLES: WASD, SHIFT, ESPACIO, RATÓN Y T\")\n    Gorbus.log(\"Recoge los nueve núcleos luminosos antes de que termine el tiempo.\")\nend\n\nfunction onUpdate(dt: number)\n    dt = clamp(dt, 0, 0.05)\n    if Gorbus.isKeyJustPressed(\"t\") then\n        resetGame()\n    end\n    if not active then return end\n\n    local player = Gorbus.getObjectPosition(PLAYER)\n    if not player then\n        active = false\n        Gorbus.lockMouse(false)\n        Gorbus.log(\"ERROR: se ha perdido Relay_Player.\")\n        return\n    end\n\n    local mouse = Gorbus.getMouseDelta()\n    yaw -= (mouse.x or 0) * 0.0022\n    pitch = clamp(pitch - (mouse.y or 0) * 0.0022, -1.3, 1.3)\n    Gorbus.setCameraPosition(player.x, player.y + 0.62, player.z)\n    Gorbus.setCameraRotation(pitch, yaw, 0)\n\n    local speed = Gorbus.isKeyDown(\"shift\") and 9.0 or 6.0\n    Gorbus.controlCharacter(speed, 6.8, PLAYER)\n\n    for _, name in ipairs(CORE_NAMES) do\n        local core = Gorbus.getObjectPosition(name)\n        if core and core.y > -10 and distance(player, core) < 1.65 then\n            Gorbus.setObjectVisible(name, false)\n            Gorbus.setPosition(name, core.x, -30, core.z)\n            collected += 1\n            score += 100\n            Gorbus.showGameMessage(\"NÚCLEO RECOGIDO · +100\")\n            Gorbus.log(\"NÚCLEO \" .. tostring(collected) .. \"/\" .. tostring(TOTAL_CORES) .. \" · PUNTOS \" .. tostring(score))\n            updateHUD()\n        end\n    end\n\n    elapsed += dt\n    remaining = math.max(0, ROUND_SECONDS - elapsed)\n    noticeClock += dt\n    if noticeClock >= 0.2 then\n        updateHUD()\n        noticeClock = 0\n    end\n\n    if collected >= TOTAL_CORES then\n        finishGame(true)\n    elseif remaining <= 0 then\n        finishGame(false)\n    end\nend\n\nfunction onStop()\n    Gorbus.lockMouse(false)\n    Gorbus.setObjectVisible(PLAYER, true)\n    Gorbus.clearGameHUD()\n    Gorbus.log(\"NEON RELAY · SESIÓN FINALIZADA\")\nend\n"
+  },
+  "objects": [
+    {
+      "name": "Relay_Floor",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        0,
+        -0.3,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        32,
+        0.5,
+        36
+      ],
+      "visible": true,
+      "color": "#101b2c",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.9,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Wall_North",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        0,
+        3,
+        -17
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        32,
+        6,
+        0.6
+      ],
+      "visible": true,
+      "color": "#1d3550",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.8,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Wall_South",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        0,
+        3,
+        17
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        32,
+        6,
+        0.6
+      ],
+      "visible": true,
+      "color": "#1d3550",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.8,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Wall_East",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        16,
+        3,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        6,
+        34
+      ],
+      "visible": true,
+      "color": "#1d3550",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.8,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Wall_West",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        -16,
+        3,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        6,
+        34
+      ],
+      "visible": true,
+      "color": "#1d3550",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.8,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Player",
+      "kind": "MESH",
+      "type": "CAPSULE",
+      "position": [
+        0,
+        0.95,
+        13
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "color": "#00e5ff",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Rigidbody",
+        "Capsule Collider"
+      ],
+      "physics": {
+        "type": "dynamic",
+        "friction": 0.65,
+        "restitution": 0,
+        "linearDamping": 0.04,
+        "angularDamping": 0.9
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Block_A",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        -8,
+        0.65,
+        6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        4,
+        1.3,
+        3
+      ],
+      "visible": true,
+      "color": "#1d3550",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.8,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Block_B",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        7,
+        0.9,
+        2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        3,
+        1.8,
+        4
+      ],
+      "visible": true,
+      "color": "#1d3550",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.8,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Block_C",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        -5,
+        0.55,
+        -4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        5,
+        1.1,
+        2.5
+      ],
+      "visible": true,
+      "color": "#1d3550",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.8,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Block_D",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        8,
+        0.7,
+        -8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        4,
+        1.4,
+        3
+      ],
+      "visible": true,
+      "color": "#1d3550",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.8,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Block_E",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        0,
+        1,
+        -12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        3,
+        2,
+        2
+      ],
+      "visible": true,
+      "color": "#1d3550",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.8,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Block_F",
+      "kind": "MESH",
+      "type": "CUBE",
+      "position": [
+        -11,
+        0.8,
+        -10
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.5,
+        1.6,
+        4
+      ],
+      "visible": true,
+      "color": "#1d3550",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Box Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.8,
+        "restitution": 0.02
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Core_01",
+      "kind": "MESH",
+      "type": "SPHERE",
+      "position": [
+        -11,
+        1.25,
+        10
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "visible": true,
+      "color": "#00e5ff",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Sphere Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.4,
+        "restitution": 0.15
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Core_02",
+      "kind": "MESH",
+      "type": "SPHERE",
+      "position": [
+        -3,
+        1.25,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "visible": true,
+      "color": "#ff3df2",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Sphere Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.4,
+        "restitution": 0.15
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Core_03",
+      "kind": "MESH",
+      "type": "SPHERE",
+      "position": [
+        5,
+        1.25,
+        10
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "visible": true,
+      "color": "#00e5ff",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Sphere Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.4,
+        "restitution": 0.15
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Core_04",
+      "kind": "MESH",
+      "type": "SPHERE",
+      "position": [
+        11,
+        1.25,
+        4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "visible": true,
+      "color": "#ff3df2",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Sphere Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.4,
+        "restitution": 0.15
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Core_05",
+      "kind": "MESH",
+      "type": "SPHERE",
+      "position": [
+        -10,
+        1.25,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "visible": true,
+      "color": "#00e5ff",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Sphere Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.4,
+        "restitution": 0.15
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Core_06",
+      "kind": "MESH",
+      "type": "SPHERE",
+      "position": [
+        -1,
+        1.25,
+        -2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "visible": true,
+      "color": "#ff3df2",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Sphere Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.4,
+        "restitution": 0.15
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Core_07",
+      "kind": "MESH",
+      "type": "SPHERE",
+      "position": [
+        10,
+        1.25,
+        -4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "visible": true,
+      "color": "#00e5ff",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Sphere Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.4,
+        "restitution": 0.15
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Core_08",
+      "kind": "MESH",
+      "type": "SPHERE",
+      "position": [
+        -7,
+        1.25,
+        -13
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "visible": true,
+      "color": "#ff3df2",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Sphere Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.4,
+        "restitution": 0.15
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Core_09",
+      "kind": "MESH",
+      "type": "SPHERE",
+      "position": [
+        5,
+        1.25,
+        -14
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "visible": true,
+      "color": "#00e5ff",
+      "roughness": 0.62,
+      "components": [
+        "Mesh Filter",
+        "Mesh Renderer",
+        "Sphere Collider"
+      ],
+      "physics": {
+        "type": "fixed",
+        "friction": 0.4,
+        "restitution": 0.15
+      },
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    },
+    {
+      "name": "Relay_Light",
+      "kind": "LIGHT",
+      "type": "LIGHT",
+      "position": [
+        0,
+        10,
+        1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "color": null,
+      "roughness": 0.62,
+      "components": [],
+      "physics": null,
+      "prefabType": null,
+      "waypoints": null,
+      "moverSpeed": null,
+      "moverIndex": null,
+      "bounceStrength": null,
+      "angularSpeed": null,
+      "rotationAngle": 0,
+      "doorName": null,
+      "doorUuid": null,
+      "isOpen": false,
+      "scriptPath": null,
+      "tools": [],
+      "modelData": null,
+      "modelFormat": null,
+      "modelFilename": null,
+      "rigProfile": null,
+      "rigPose": null
+    }
+  ]
+}
