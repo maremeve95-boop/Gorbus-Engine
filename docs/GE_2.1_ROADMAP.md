@@ -2,6 +2,15 @@
 
 Este documento recoge las próximas líneas de trabajo propuestas para Gorbus Engine. **No describe funciones que ya estén disponibles en GE 2.0.0**: las marca como objetivos de diseño y define cómo comprobarlas antes de anunciarlas.
 
+## Entregado en GE 2.1 Preview — herramientas de mundo
+
+- [x] Selección múltiple desde Hierarchy con Ctrl/Cmd y Shift, además de selección múltiple desde Scene con Ctrl/Cmd.
+- [x] Seleccionar todo y limpiar selección.
+- [x] Colocación por lotes con un mundo Rapier temporal, límite de 300 objetos por operación y soporte de colliders fijos existentes.
+- [x] Restricción al plano XY para proyectos 2D.
+
+Limitaciones de esta primera versión: usa formas simplificadas derivadas de los bounding boxes; no hace mesh-collision exacta, no procesa rigs como cuerpos físicos y necesita revisar el resultado final. La simulación se usa como herramienta de edición previa, no durante Play.
+
 ## Objetivos
 
 ### 1. Rendimiento del motor y escenas grandes
@@ -13,8 +22,8 @@ Este documento recoge las próximas líneas de trabajo propuestas para Gorbus En
 
 **Criterio:** el objetivo no será prometer «infinitos objetos», sino publicar resultados reproducibles con escenas y dispositivos de prueba concretos.
 
-### 2. Diseño de mundos y colocación física por lotes
-- Permitir seleccionar muchos assets u objetos a la vez desde Assets, Hierarchy o Scene.
+### 2. Diseño de mundos y colocación física por lotes — ampliaciones pendientes
+- Ampliar la selección múltiple actual a Assets y a más flujos de Scene.
 - Añadir operaciones de lote: colocar sobre superficie, distribuir en cuadrícula, ordenar por filas, dispersar con semilla, alinear y agrupar.
 - Crear una acción **Colocar con física** que genere una previsualización, compruebe colisiones y deje que Rapier estabilice los cuerpos dentro de un límite de tiempo/iteraciones.
 - Ofrecer opciones para conservar o restablecer posición, rotación, escala y tipo de Rigidbody; excluir objetos anclados o marcados como estáticos.
