@@ -258,4 +258,7 @@ writeFileSync(ge103SourcePath, ge103Source);
 const ge103CssPath = resolve('src/ge101.css');
 const ge103Css = patchGorbusGE101CSS(readFileSync(ge103CssPath, 'utf8'));
 writeFileSync(ge103CssPath, ge103Css);
+let ge103Html = readFileSync('index.html', 'utf8');
+ge103Html = ge103Html.replaceAll('Gorbus Engine 1.0.1', 'Gorbus Engine 1.0.3').replaceAll('GE 1.0.1', 'GE 1.0.3');
+writeFileSync('index.html', ge103Html);
 console.log('Gorbus Engine GE 1.0.3: Luau game camera, mouse capture/deltas and camera component enabled.');
