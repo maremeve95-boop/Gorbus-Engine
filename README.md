@@ -1,4 +1,4 @@
-# Gorbus Engine [v2.1.0] — Release Preview
+# Gorbus Engine [v3.0.0] — Preview
 
 Editor web para desarrollar juegos 2D y 3D con Three.js, Rapier y scripts Luau. Esta entrega amplía la base GE 1.0.4.
 
@@ -85,6 +85,14 @@ También incluye herramientas de mundo GE 2.1, assets procedurales, un registro 
 **Alcance:** el port HTML es asistido por IA y requiere revisión; los archivos Web se guardan en `Web/` y pueden previsualizarse, pero Play ejecuta Luau. Crowd Bake usa instancing y proxies, no 500 rigs esqueléticos independientes. ECS-lite es un registro de entidades, no un motor ECS completo. Keyframes básicos no equivalen a un animador inteligente. La UI Builder crea scaffolds web, no un editor completo de HUD nativo.
 
 Consulta `docs/GE_2.1.0_RELEASE.md` para las funciones incluidas, las limitaciones y los pasos de validación.
+
+## Gorbus Engine 3.0.0 — profiler y diagnóstico
+
+- **Profiler runtime:** muestra FPS aproximados, frame time, draw calls, triángulos, geometrías, texturas y memoria JS cuando el navegador expone esa métrica. Se activa desde Luau con `Gorbus.setProfilerVisible(true)` y se oculta con `false`.
+- **Transform API:** `getObjectScale`, `setObjectScale`, `getObjectRotation` y `setObjectRotation` permiten consultar y cambiar escala/rotación durante Play. La rotación usa grados.
+- **Diagnóstico de proyectos:** ejecuta `npm run diagnose -- ruta/al/proyecto.gorbus` para detectar nombres duplicados, transforms inválidos, archivos de script vacíos y algunas incoherencias físicas.
+
+El profiler mide estadísticas del renderer y no atribuye todavía CPU por sistema, GPU real ni memoria total del proceso. El diagnóstico es estructural, no compila ni ejecuta Luau. Estas herramientas son una primera base para optimizar proyectos con datos, no una promesa de rendimiento universal.
 
 ## Ejecutar localmente
 
