@@ -299,8 +299,13 @@ const ge200OverlayFiles = [
   'ge200-overlay-06b.br64',
   'ge200-overlay-06c.br64'
 ].map((file) => readFileSync(resolve('build-assets', file), 'utf8').trim());
+const ge200OverlayCompressed = Buffer.from(ge200OverlayFiles.join(''), 'base64');
+const ge200OverlayDigest = createHash('sha256').update(ge200OverlayCompressed).digest('hex');
+if (ge200OverlayDigest !== '2b3c1243c828de1bd1d2a3d61a2da9fc5433cae02a4cc8a861412e3be18c06ce') {
+  throw new Error('Gorbus Engine GE 2.0.0 overlay failed SHA-256 integrity verification.');
+}
 const ge200Overlay = JSON.parse(
-  brotliDecompressSync(Buffer.from(ge200OverlayFiles.join(''), 'base64')).toString('utf8')
+  brotliDecompressSync(ge200OverlayCompressed).toString('utf8')
 );
 const ge200AllowedFiles = new Set([
   'scripts/ge-2.0.0-engine.mjs',
