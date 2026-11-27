@@ -106,6 +106,55 @@ function selectObject(obj) {
 }`;
   main = replaceOnce(main, oldHierarchy, newHierarchy, 'hierarchy multi-select');
 
+  const oldPhysicsShape = \`function objectPhysicsShape(obj){
+  const mesh=obj.isMesh?obj:obj.children.find(c=>c.isMesh);
+  if(!mesh?.geometry)return {type:'box',size:new THREE.Vector3(.5,.5,.5)};
+  mesh.geometry.computeBoundingBox();
+  const size=mesh.geometry.boundingBox.getSize(new THREE.Vector3());
+  const effectiveScale=mesh===obj?obj.scale.clone():obj.scale.clone().multiply(mesh.scale);
+  size.multiply(effectiveScale).multiplyScalar(.5);
+  size.set(Math.max(.04,Math.abs(size.x)),Math.max(.04,Math.abs(size.y)),Math.max(.04,Math.abs(size.z)));
+  const type=componentHas(obj,'Capsule Collider')?'capsule':(componentHas(obj,'Sphere Collider')?'sphere':'box');
+  return {type,size};
+}\`;
+  const newPhysicsShape = \`function objectPhysicsShape(obj){
+  const fallback={type:'box',size:new THREE.Vector3(.5,.5,.5),center:new THREE.Vector3()};
+  if(!obj?.isObject3D)return fallback;
+  obj.updateWorldMatrix(true,true);
+  const inverseRoot=obj.matrixWorld.clone().invert();
+  const bounds=new THREE.Box3();
+  const localBounds=new THREE.Box3();
+  const relative=new THREE.Matrix4();
+  const point=new THREE.Vector3();
+  let hasGeometry=false;
+  obj.traverse(child=>{
+    if(!child.isMesh||!child.geometry||!child.visible)return;
+    const geometry=child.geometry;
+    if(!geometry.boundingBox)geometry.computeBoundingBox();
+    if(!geometry.boundingBox)return;
+    relative.multiplyMatrices(inverseRoot,child.matrixWorld);
+    localBounds.copy(geometry.boundingBox);
+    for(let corner=0;corner<8;corner++){
+      point.set((corner&1)?localBounds.max.x:localBounds.min.x,(corner&2)?localBounds.max.y:localBounds.min.y,(corner&4)?localBounds.max.z:localBounds.min.z);
+      point.applyMatrix4(relative).multiply(obj.scale);
+      bounds.expandByPoint(point);
+    }
+    hasGeometry=true;
+  });
+  if(!hasGeometry||bounds.isEmpty())return fallback;
+  const center=bounds.getCenter(new THREE.Vector3());
+  const size=bounds.getSize(new THREE.Vector3()).multiplyScalar(.5);
+  size.set(Math.max(.04,Math.abs(size.x)),Math.max(.04,Math.abs(size.y)),Math.max(.04,Math.abs(size.z)));
+  const type=componentHas(obj,'Capsule Collider')?'capsule':(componentHas(obj,'Sphere Collider')?'sphere':'box');
+  return {type,size,center};
+}\`;
+  main = replaceOnce(main, oldPhysicsShape, newPhysicsShape, 'nested imported-model collider bounds');
+
+  const oldColliderOffset = \`      :(shape.type==='sphere'?RAPIER.ColliderDesc.ball(Math.max(shape.size.x,shape.size.y,shape.size.z)):RAPIER.ColliderDesc.cuboid(shape.size.x,shape.size.y,shape.size.z));\`;
+  const newColliderOffset = \`      :(shape.type==='sphere'?RAPIER.ColliderDesc.ball(Math.max(shape.size.x,shape.size.y,shape.size.z)):RAPIER.ColliderDesc.cuboid(shape.size.x,shape.size.y,shape.size.z));
+    colliderDesc.setTranslation(shape.center.x,shape.center.y,currentProjectMode==='2d'?0:shape.center.z);\`;
+  main = replaceOnce(main, oldColliderOffset, newColliderOffset, 'runtime collider local center');
+
   const pointerAnchor = `if(hits.length){let obj=hits[0].object;while(obj.parent&&obj.parent!==scene)obj=obj.parent;selectObject(editable.includes(obj)?obj:null);}else if(currentTool==='select')selectObject(null);`;
   const pointerReplacement = `if(hits.length){let obj=hits[0].object;while(obj.parent&&obj.parent!==scene)obj=obj.parent;if(editable.includes(obj)&&(e.ctrlKey||e.metaKey)){const next=new Set(selectedObjects);if(next.has(obj))next.delete(obj);else next.add(obj);hierarchySelectionAnchor=obj;setObjectSelection([...next],next.has(obj)?obj:[...next].at(-1)||null);}else selectObject(editable.includes(obj)?obj:null);}else if(currentTool==='select')selectObject(null);`;
   main = replaceOnce(main, pointerAnchor, pointerReplacement, 'viewport modifier selection');
@@ -113,7 +162,8 @@ function selectObject(obj) {
   const marker = 'window.GorbusEngine={';
   const helper = `async function autoSettleObjects(objects = [...selectedObjects], options = {}) {
   if(isPlaying)throw new Error('Detén Play antes de colocar objetos.');
-  const targets=[...new Set((objects||[]).filter(obj=>editable.includes(obj)&&kindOf(obj)!=='LIGHT'&&(obj.isMesh||obj.children?.some(child=>child.isMesh))))];
+  const hasMeshGeometry=obj=>{let found=false;obj?.traverse?.(child=>{if(child.isMesh&&child.geometry&&child.visible)found=true;});return found;};
+  const targets=[...new Set((objects||[]).filter(obj=>editable.includes(obj)&&kindOf(obj)!=='LIGHT'&&hasMeshGeometry(obj)))];
   if(!targets.length)throw new Error('Selecciona al menos un objeto con geometría.');
   if(targets.length>300)throw new Error('La colocación por lotes admite hasta 300 objetos por operación. Divide la selección en grupos.');
   await ensureRapier();
@@ -130,6 +180,7 @@ function selectObject(obj) {
       const radius=Math.max(.05,Math.min(shape.size.x,shape.size.z));
       desc=RAPIER.ColliderDesc.capsule(Math.max(.02,shape.size.y-radius),radius);
     }else desc=RAPIER.ColliderDesc.cuboid(shape.size.x,shape.size.y,is2d?Math.max(.05,shape.size.z):shape.size.z);
+    desc.setTranslation(shape.center.x,shape.center.y,is2d?0:shape.center.z);
     return desc.setFriction(.82).setRestitution(.025);
   };
   try{
