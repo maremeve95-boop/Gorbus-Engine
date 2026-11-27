@@ -18,7 +18,7 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Restore and verify GE 2.0.0 sources
+      - name: Restore and verify GE 2.1.0 sources
         run: npm run check
       - name: Build production bundle
         run: npm run build
