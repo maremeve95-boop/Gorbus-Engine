@@ -112,3 +112,43 @@ Usa **Adjuntar archivos** o arrastra archivos al cuadro de Gorbus AI. Se leen co
 Límites: hasta 5 archivos, 128 KB por archivo y 384 KB en total. Puedes quitar cada adjunto antes de enviar. Los formatos binarios (por ejemplo, PDF, ZIP, imágenes y ejecutables) no se interpretan con este lector de texto. Los archivos se leen como contenido, no se ejecutan.
 
 Gorbus AI puede explicar, revisar o tomar como referencia los adjuntos. El asistente sigue generando scripts Luau dentro de los paths admitidos por el motor; adjuntar un HTML o JavaScript no significa que el runtime del juego pueda ejecutar esos archivos ni que se apliquen automáticamente al propio editor.
+
+
+## GE 1.0.3 — cámara de juego, ratón y matemáticas Luau
+
+### API Luau añadida
+
+| Método | Comportamiento |
+|---|---|
+| `Gorbus.lockMouse(boolean)` | Solicita Pointer Lock durante Play o libera el cursor con `false`. Devuelve un booleano indicando si la solicitud pudo iniciarse. |
+| `Gorbus.getMouseDelta()` | Devuelve `{ x, y }` con el movimiento acumulado en píxeles desde la lectura anterior. Se reinicia al leerlo; úsalo una vez por `onUpdate`. |
+| `Gorbus.setCameraPosition(x, y, z)` | Coloca la cámara de juego en coordenadas de mundo. |
+| `Gorbus.setCameraRotation(x, y, z)` | Establece la rotación Euler en radianes, orden YXZ: X = pitch, Y = yaw, Z = roll. |
+| `Gorbus.getObjectPosition(name)` | Devuelve `{ x, y, z }` o `nil`. Si el objeto tiene cuerpo Rapier, lee la posición física actual. |
+
+### Cámara de juego
+
+- El nuevo modo `Gorbus.setCameraMode("game")` desactiva OrbitControls y deja la cámara bajo control directo de Luau.
+- En **Añadir componente** existe el componente **Camera**. Al iniciar Play, la primera cámara encontrada pasa a ser la cámara de juego y usa la posición y orientación del objeto que la contiene.
+- Al pulsar Stop se restaura la cámara del editor y se libera Pointer Lock.
+- Las llamadas `setCameraPosition` y `setCameraRotation` también activan el modo `game`, por lo que un script puede controlar la cámara sin añadir el componente Camera.
+- El ejemplo `examples/first-person-camera.luau` muestra movimiento WASD relativo al yaw, control del ratón, cámara a la altura de la cabeza y salto con Rigidbody.
+
+**Permiso del navegador:** Pointer Lock necesita una acción directa del usuario. Si `Gorbus.lockMouse(true)` se llama desde `onStart` y el navegador bloquea la solicitud asíncrona, Gorbus muestra el botón **Capturar ratón**. Haz clic una vez para autorizarlo. Pulsa Esc para liberar el cursor y detener Play.
+
+### Matemáticas Luau
+
+`math.sin`, `math.cos`, `math.rad`, `math.pi`, `math.clamp` y `math.sqrt` pertenecen a la biblioteca estándar de Luau. No son APIs de Roblox ni requieren módulos adicionales. GE 1.0.3 ejecuta una prueba de humo sobre `sin`, `cos` y `rad` al inicializar el intérprete y falla con un mensaje explícito si falta alguna función.
+
+Ejemplo de dirección según el yaw:
+
+```lua
+local forwardX = math.sin(yaw)
+local forwardZ = -math.cos(yaw)
+local rightX = math.cos(yaw)
+local rightZ = math.sin(yaw)
+```
+
+### Alcance y limitaciones
+
+Pointer Lock depende de permisos y soporte del navegador; el botón de autorización es la alternativa si una llamada programática no conserva el gesto del usuario. `getMouseDelta` devuelve desplazamiento en píxeles, no una velocidad física independiente del intervalo; el script puede dividirlo por `dt` si necesita una tasa. El componente Camera activa la primera cámara de la escena; todavía no hay selector de prioridad para varias cámaras.
