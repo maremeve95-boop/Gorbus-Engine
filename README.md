@@ -121,6 +121,12 @@ Se ha iniciado un port nativo del juego STRYDE v1.4 en `ports/stryde-v14/`. La p
 
 Esta fase se centra en validar cámara, movimiento, raycast, física, balizas y puntuación. El HUD implementado es específico para esta ronda; todavía no existe un editor general de HUD/UI de juegos. Los otros modos originales, bots, tienda, cosméticos, progreso persistente, audio y red siguen pendientes. Consulta `ports/stryde-v14/README.md` para abrir la escena.
 
+## Juego de prueba: NEON RELAY
+
+Se incluye un juego 3D autocontenido para probar Gorbus Engine 2.1.0. Abre `samples/NEON_RELAY/NEON_RELAY.gorbus` desde **Abrir escena** y recoge nueve núcleos antes de que termine el contador. Comprueba cápsula física, cámara FPS, ratón, WASD, salto, colisiones, Luau, coleccionables y HUD.
+
+Consulta `samples/NEON_RELAY/README.md` para los controles y objetivos. El CI también valida la estructura de la escena y la sincronización de sus scripts.
+
 ## Tecnologías
 
 - Three.js `0.185.0` — render y viewport.
