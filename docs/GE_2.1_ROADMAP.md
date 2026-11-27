@@ -7,9 +7,10 @@ Este documento recoge las próximas líneas de trabajo propuestas para Gorbus En
 - [x] Selección múltiple desde Hierarchy con Ctrl/Cmd y Shift, además de selección múltiple desde Scene con Ctrl/Cmd.
 - [x] Seleccionar todo y limpiar selección.
 - [x] Colocación por lotes con un mundo Rapier temporal, límite de 300 objetos por operación y soporte de colliders fijos existentes.
+- [x] Detección recursiva de geometría en modelos GLB anidados y cálculo de bounds en el espacio local del objeto, incluyendo offsets de collider.
 - [x] Restricción al plano XY para proyectos 2D.
 
-Limitaciones de esta primera versión: usa formas simplificadas derivadas de los bounding boxes; no hace mesh-collision exacta, no procesa rigs como cuerpos físicos y necesita revisar el resultado final. La simulación se usa como herramienta de edición previa, no durante Play.
+Limitaciones de esta primera versión: usa formas simplificadas derivadas de bounding boxes (aunque recorre las mallas anidadas y respeta sus transformaciones y centros locales); no hace mesh-collision exacta, no hornea rigs animados como cuerpos físicos, no ofrece todavía una previsualización/cancelación completa y necesita revisar el resultado final. La simulación se usa como herramienta de edición previa, no durante Play.
 
 ## Objetivos
 
