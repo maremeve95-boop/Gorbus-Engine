@@ -26,8 +26,8 @@ const hudHelpers = [
 "      '#gorbusRuntimeGameHUD .stryde-timer{text-align:center;border-left:0;border-bottom:2px solid #ff6a1a;min-width:112px}',",
 "      '#gorbusRuntimeGameHUD .stryde-caption{display:block;color:#a8dcff;font:10px Share Tech Mono,monospace;letter-spacing:.18em;margin-bottom:4px}',",
 "      '#gorbusRuntimeGameHUD .stryde-timer strong{font-size:clamp(22px,3vw,34px);font-variant-numeric:tabular-nums;letter-spacing:.08em}',",
-"      '#gorbusRuntimeGameHUD .stryde-weapon{text-align:right;border-left:0;border-right:2px solid #a8dcff}',",
-"      '#gorbusRuntimeGameHUD .stryde-weapon strong{font-size:clamp(12px,1.2vw,17px);letter-spacing:.09em;overflow-wrap:anywhere}',",
+"      '#gorbusRuntimeGameHUD .stryde-mode{text-align:right;border-left:0;border-right:2px solid #a8dcff}',",
+"      '#gorbusRuntimeGameHUD .stryde-mode strong{font-size:clamp(12px,1.2vw,17px);letter-spacing:.09em;overflow-wrap:anywhere}',",
 "      '#gorbusRuntimeGameHUD .stryde-stats{position:absolute;left:16px;bottom:18px;display:grid;grid-template-columns:repeat(3,minmax(76px,1fr));gap:7px;max-width:min(420px,65vw)}',",
 "      '#gorbusRuntimeGameHUD .stryde-stat{padding:8px 11px;background:rgba(7,10,15,.72);border:1px solid rgba(255,255,255,.13);border-bottom:2px solid rgba(168,220,255,.55)}',",
 "      '#gorbusRuntimeGameHUD .stryde-stat span{display:block;color:#a8dcff;font:10px Share Tech Mono,monospace;letter-spacing:.12em}',",
@@ -48,12 +48,12 @@ const hudHelpers = [
 "  }",
 "  root = document.createElement('div');",
 "  root.id = 'gorbusRuntimeGameHUD';",
-"  root.innerHTML = \"<div class='stryde-top'><div class='stryde-panel'><div class='stryde-brand'>STRYDE<span>CAMPO ORIÓN · TRAINING</span></div></div><div class='stryde-panel stryde-timer'><span class='stryde-caption'>TIEMPO</span><strong data-stryde='time'>01:00</strong></div><div class='stryde-panel stryde-weapon'><span class='stryde-caption'>ARMA EQUIPADA</span><strong data-stryde='weapon'>S-9 PULSE</strong></div></div><div class='stryde-stats'><div class='stryde-stat'><span>PUNTOS</span><strong data-stryde='score'>0</strong></div><div class='stryde-stat'><span>PRECISIÓN</span><strong data-stryde='accuracy'>0%</strong></div><div class='stryde-stat'><span>ELIMINADOS</span><strong data-stryde='kills'>0</strong></div></div><div class='stryde-rank'><span>RANGO</span><strong data-stryde='rank'>--</strong></div><div class='stryde-crosshair'></div><div class='stryde-toast' data-stryde='toast'></div><div class='stryde-help'>WASD MOVER · SHIFT CORRER · CLIC DISPARAR · 1–4 ARMAS · T REINICIAR</div>\";",
+"  root.innerHTML = \"<div class='stryde-top'><div class='stryde-panel'><div class='stryde-brand'>STRYDE<span>CAMPO ORIÓN · TRAINING</span></div></div><div class='stryde-panel stryde-timer'><span class='stryde-caption'>TIEMPO</span><strong data-stryde='time'>01:00</strong></div><div class='stryde-panel stryde-mode'><span class='stryde-caption'>MODO DE ESCANEO</span><strong data-stryde='mode'>S-9 PULSE</strong></div></div><div class='stryde-stats'><div class='stryde-stat'><span>PUNTOS</span><strong data-stryde='score'>0</strong></div><div class='stryde-stat'><span>PRECISIÓN</span><strong data-stryde='accuracy'>0%</strong></div><div class='stryde-stat'><span>BALIZAS ACTIVADAS</span><strong data-stryde='nodes'>0</strong></div></div><div class='stryde-rank'><span>RANGO</span><strong data-stryde='rank'>--</strong></div><div class='stryde-crosshair'></div><div class='stryde-toast' data-stryde='toast'></div><div class='stryde-help'>WASD MOVER · SHIFT CORRER · CLIC ESCANEAR · 1–4 ARMAS · T REINICIAR</div>\";",
 "  viewport.appendChild(root);",
 "  requestAnimationFrame(() => root?.classList.add('visible'));",
 "  return root;",
 "}",
-"function setGorbusRuntimeHUD(seconds=60, score=0, accuracy=0, weapon='-', eliminations=0, rank='--') {",
+"function setGorbusRuntimeHUD(seconds=60, score=0, accuracy=0, modeName='-', activatedNodes=0, rank='--') {",
 "  const root = ensureGorbusRuntimeHUD();",
 "  if (!root) return false;",
 "  const whole = Math.ceil(Math.max(0, Number(seconds) || 0));",
@@ -62,8 +62,8 @@ const hudHelpers = [
 "  root.querySelector('[data-stryde=\"time\"]').textContent = String(minutes).padStart(2,'0') + ':' + String(secondsPart).padStart(2,'0');",
 "  root.querySelector('[data-stryde=\"score\"]').textContent = Math.max(0, Math.floor(Number(score) || 0)).toLocaleString('es-ES');",
 "  root.querySelector('[data-stryde=\"accuracy\"]').textContent = Math.max(0, Math.min(100, Number(accuracy) || 0)) + '%';",
-"  root.querySelector('[data-stryde=\"weapon\"]').textContent = String(weapon || '-').slice(0,32);",
-"  root.querySelector('[data-stryde=\"kills\"]').textContent = Math.max(0, Math.floor(Number(eliminations) || 0));",
+"  root.querySelector('[data-stryde=\"mode\"]').textContent = String(modeName || '-').slice(0,32);",
+"  root.querySelector('[data-stryde=\"nodes\"]').textContent = Math.max(0, Math.floor(Number(activatedNodes) || 0));",
 "  root.querySelector('[data-stryde=\"rank\"]').textContent = String(rank || '--').slice(0,2);",
 "  return true;",
 "}",
@@ -94,15 +94,15 @@ export function patchGE21RuntimeHUD(original) {
     main = replaceOnce(
       main,
       '    setObjectVisible:(name,visible)=>{const obj=findObject(name);if(!obj)return false;obj.visible=Boolean(visible);return true;},',
-      '    setObjectVisible:(name,visible)=>{const obj=findObject(name);if(!obj)return false;obj.visible=Boolean(visible);return true;},\n    setGameHUD:(seconds=60,score=0,accuracy=0,weapon="-",eliminations=0,rank="--")=>setGorbusRuntimeHUD(seconds,score,accuracy,weapon,eliminations,rank),\n    showGameMessage:(message,duration=1050)=>showGorbusRuntimeHUDMessage(message,duration),\n    clearGameHUD:()=>clearGorbusRuntimeHUD(),',
+      '    setObjectVisible:(name,visible)=>{const obj=findObject(name);if(!obj)return false;obj.visible=Boolean(visible);return true;},\n    setGameHUD:(seconds=60,score=0,accuracy=0,modeName="-",activatedNodes=0,rank="--")=>setGorbusRuntimeHUD(seconds,score,accuracy,modeName,activatedNodes,rank),\n    showGameMessage:(message,duration=1050)=>showGorbusRuntimeHUDMessage(message,duration),\n    clearGameHUD:()=>clearGorbusRuntimeHUD(),',
       'public game HUD API'
     );
   }
-  if (!main.includes('Gorbus.setGameHUD(seconds,score,accuracy,weapon,eliminations,rank)')) {
+  if (!main.includes('Gorbus.setGameHUD(seconds,score,accuracy,modeName,activatedNodes,rank)')) {
     main = replaceOnce(
       main,
       '- Gorbus.setObjectVisible(name,visible): muestra u oculta la malla sin retirar el cuerpo físico que se creó al iniciar Play.',
-      '- Gorbus.setObjectVisible(name,visible): muestra u oculta la malla sin retirar el cuerpo físico que se creó al iniciar Play.\n- Gorbus.setGameHUD(seconds,score,accuracy,weapon,eliminations,rank): muestra el HUD arcade del viewport con los datos de partida.\n- Gorbus.showGameMessage(message,duration): muestra un aviso breve en el HUD.\n- Gorbus.clearGameHUD(): retira el HUD al terminar el juego.',
+      '- Gorbus.setObjectVisible(name,visible): muestra u oculta la malla sin retirar el cuerpo físico que se creó al iniciar Play.\n- Gorbus.setGameHUD(seconds,score,accuracy,modeName,activatedNodes,rank): muestra el HUD arcade del viewport con el modo de escaneo y los datos de partida.\n- Gorbus.showGameMessage(message,duration): muestra un aviso breve en el HUD.\n- Gorbus.clearGameHUD(): retira el HUD al terminar el juego.',
       'document runtime game HUD API'
     );
   }
