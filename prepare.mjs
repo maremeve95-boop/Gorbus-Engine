@@ -349,4 +349,6 @@ const ge21StudioPath = resolve('src/gorbus-v2-studio.js');
 writeFileSync(ge21StudioPath, patchGE21Studio(readFileSync(ge21StudioPath, 'utf8')));
 const { patchGE21MouseInput } = await import('./scripts/ge-2.1-mouse-input.mjs');
 writeFileSync(mainPath, patchGE21MouseInput(readFileSync(mainPath, 'utf8')));
-console.log('Gorbus Engine GE 2.1 Preview: multi-selection, Rapier batch placement and Luau mouse buttons enabled.');
+const { patchGE21RuntimeHUD } = await import('./scripts/ge-2.1-runtime-hud.mjs');
+writeFileSync(mainPath, patchGE21RuntimeHUD(readFileSync(mainPath, 'utf8')));
+console.log('Gorbus Engine GE 2.1 Preview: multi-selection, physics placement, mouse input and native runtime HUD enabled.');
