@@ -341,4 +341,10 @@ writeFileSync(ge200CssPath, readFileSync(resolve('build-assets', 'gorbus-enhance
 writeFileSync(ge200AccountPath, readFileSync(resolve('build-assets', 'gorbus-enhancements.base.js'), 'utf8'));
 writeFileSync(ge200CssPath, patchGE200CSS(readFileSync(ge200CssPath, 'utf8')));
 writeFileSync(ge200AccountPath, patchGE200Enhancements(readFileSync(ge200AccountPath, 'utf8')));
-console.log('Gorbus Engine 2.0.0 Patched: 2D/3D, fixed NVIDIA Nemotron, animated models, basic rig, procedural modeling, mechanics and runtime tests enabled.');
+
+// GE 2.1 Preview: multi-selection and Rapier batch placement.
+const { patchGE21Main, patchGE21Studio } = await import('./scripts/ge-2.1-world-tools.mjs');
+writeFileSync(mainPath, patchGE21Main(readFileSync(mainPath, 'utf8')));
+const ge21StudioPath = resolve('src/gorbus-v2-studio.js');
+writeFileSync(ge21StudioPath, patchGE21Studio(readFileSync(ge21StudioPath, 'utf8')));
+console.log('Gorbus Engine GE 2.1 Preview: multi-selection and Rapier batch placement enabled.');
