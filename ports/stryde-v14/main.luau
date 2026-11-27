@@ -80,6 +80,8 @@ local function resetRound()
     lastTimeNotice = ROUND_SECONDS
     yaw = 0
     pitch = 0
+    updateHUD("--")
+    Gorbus.showGameMessage("CAMPO ORIÓN · NUEVA RONDA")
 
     for _, target in ipairs(targets) do
         resetTarget(target)
@@ -94,6 +96,15 @@ local function resetRound()
     Gorbus.log("STRYDE · NUEVA RONDA | 60 segundos | munición infinita")
 end
 
+local function accuracyPercent(): number
+    if shots <= 0 then return 0 end
+    return math.floor((hits / shots) * 100 + 0.5)
+end
+
+local function updateHUD(rank: string?)
+    Gorbus.setGameHUD(remaining, score, accuracyPercent(), weapons[weaponIndex].name, eliminations, rank or "--")
+end
+
 local function finishRound()
     if finished then
         return
@@ -102,10 +113,7 @@ local function finishRound()
     active = false
     Gorbus.lockMouse(false)
 
-    local accuracy = 0
-    if shots > 0 then
-        accuracy = math.floor((hits / shots) * 100 + 0.5)
-    end
+    local accuracy = accuracyPercent()
 
     local rank = "C"
     if score >= 900 and accuracy >= 70 then
@@ -115,6 +123,8 @@ local function finishRound()
     elseif score >= 250 then
         rank = "B"
     end
+    updateHUD(rank)
+    Gorbus.showGameMessage("FIN DE RONDA · RANGO " .. rank .. " · PULSA T")
 
     Gorbus.log("════════ STRYDE · RESULTADOS ════════")
     Gorbus.log("PUNTUACIÓN: " .. tostring(score) .. " | RANGO: " .. rank)
@@ -178,9 +188,11 @@ local function fireShot()
         target.respawn = 1.7
         Gorbus.setPosition(target.name, target.x, -35, target.z)
         Gorbus.setColor(target.name, "#4a5664")
+        Gorbus.showGameMessage("OBJETIVO ELIMINADO · +100")
         Gorbus.log("OBJETIVO DESTRUIDO · +100 · TOTAL " .. tostring(score))
     else
         Gorbus.setColor(target.name, "#ff9b55")
+        Gorbus.showGameMessage("IMPACTO · +25")
         Gorbus.log("IMPACTO · " .. result.name .. " · " .. tostring(math.max(0, target.health)) .. "%")
     end
 end
@@ -203,6 +215,8 @@ function onStart()
     -- La física ya fue construida antes de onStart; ocultamos solo el modelo visual
     -- para evitar que la cápsula del jugador tape la cámara en primera persona.
     Gorbus.setObjectVisible(PLAYER, false)
+    Gorbus.setGameHUD(ROUND_SECONDS, score, 0, weapons[weaponIndex].name, eliminations, "--")
+    Gorbus.showGameMessage("CAMPO ORIÓN · ENTRENAMIENTO")
     Gorbus.setCameraMode("game", 0.1)
     Gorbus.lockMouse(true)
     local player = Gorbus.getObjectPosition(PLAYER)
@@ -259,10 +273,10 @@ function onUpdate(dt: number)
     Gorbus.setCameraRotation(pitch, yaw, 0)
     Gorbus.controlCharacter(speed, 6.8, PLAYER)
 
-    if Gorbus.isKeyJustPressed("1") then weaponIndex = 1; Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
-    if Gorbus.isKeyJustPressed("2") then weaponIndex = 2; Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
-    if Gorbus.isKeyJustPressed("3") then weaponIndex = 3; Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
-    if Gorbus.isKeyJustPressed("4") then weaponIndex = 4; Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
+    if Gorbus.isKeyJustPressed("1") then weaponIndex = 1; Gorbus.showGameMessage("ARMA · " .. weapons[weaponIndex].name); Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
+    if Gorbus.isKeyJustPressed("2") then weaponIndex = 2; Gorbus.showGameMessage("ARMA · " .. weapons[weaponIndex].name); Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
+    if Gorbus.isKeyJustPressed("3") then weaponIndex = 3; Gorbus.showGameMessage("ARMA · " .. weapons[weaponIndex].name); Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
+    if Gorbus.isKeyJustPressed("4") then weaponIndex = 4; Gorbus.showGameMessage("ARMA · " .. weapons[weaponIndex].name); Gorbus.log("ARMA · " .. weapons[weaponIndex].name) end
 
     fireCooldown = math.max(0, fireCooldown - dt)
     if Gorbus.isMouseButtonDown(0) and fireCooldown <= 0 then
@@ -285,6 +299,7 @@ function onUpdate(dt: number)
         Gorbus.log("MARCADOR · " .. tostring(score) .. " pts · " .. tostring(eliminations) .. " objetivos · " .. tostring(accuracy) .. "% precisión")
     end
 
+    updateHUD("--")
     if remaining <= 0 then
         finishRound()
     end
@@ -293,5 +308,6 @@ end
 function onStop()
     Gorbus.lockMouse(false)
     Gorbus.setObjectVisible(PLAYER, true)
+    Gorbus.clearGameHUD()
     Gorbus.log("STRYDE: sesión detenida.")
 end
