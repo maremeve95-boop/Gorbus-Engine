@@ -1,4 +1,4 @@
-# Gorbus Engine — GE 2.0.0 Patched
+# Gorbus Engine [v2.1.0] — Release Preview
 
 Editor web para desarrollar juegos 2D y 3D con Three.js, Rapier y scripts Luau. Esta entrega amplía la base GE 1.0.4.
 
@@ -75,6 +75,16 @@ La restauración aplica estas herramientas después de GE 2.0.0 en cada ejecuci�
 ## Cómo se restauran las fuentes de GE 2.0.0
 
 El repositorio conserva el sistema de capas comprimidas que ya utilizaba el proyecto. El código de GE 2.0.0 se almacena en `build-assets/ge200-overlay-*.br64`; `prepare.mjs` concatena los diez fragmentos, valida el SHA-256 del archivo comprimido y restaura únicamente las rutas permitidas antes de aplicar las mejoras al editor. Así, `npm run dev`, `npm run check` y `npm run build` parten de las mismas fuentes restauradas. No edites los fragmentos a mano: cambia el archivo fuente restaurado, actualiza el overlay y su hash como una única operación.
+
+## Gorbus Engine 2.1.0 — novedades
+
+Esta release preview moderniza el lanzador de proyectos, añade ventanas de script multiarchivo con números de línea y resaltado de sintaxis inicial, asistente de migración de HTML/CSS/JS mediante Gorbus AI, plantilla FPS con cápsula física y un HUD de juego de ejemplo.
+
+También incluye herramientas de mundo GE 2.1, assets procedurales, un registro ECS-lite, Crowd Bake mediante instancing, keyframes básicos y plantillas de UI web responsive.
+
+**Alcance:** el port HTML es asistido por IA y requiere revisión; los archivos Web se guardan en `Web/` y pueden previsualizarse, pero Play ejecuta Luau. Crowd Bake usa instancing y proxies, no 500 rigs esqueléticos independientes. ECS-lite es un registro de entidades, no un motor ECS completo. Keyframes básicos no equivalen a un animador inteligente. La UI Builder crea scaffolds web, no un editor completo de HUD nativo.
+
+Consulta `docs/GE_2.1.0_RELEASE.md` para las funciones incluidas, las limitaciones y los pasos de validación.
 
 ## Ejecutar localmente
 
