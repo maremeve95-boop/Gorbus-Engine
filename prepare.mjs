@@ -247,3 +247,15 @@ const { enhanceGorbusAISource } = await import('./scripts/ge-1.0.2-ai.mjs');
 main = enhanceGorbusAISource(readFileSync(mainPath, 'utf8'));
 writeFileSync(mainPath, main);
 console.log('Gorbus Engine GE 1.0.2: Gorbus AI live script editing and text/code attachments enabled.');
+
+// GE 1.0.3: game-camera ownership, mouse capture/deltas and native Luau math checks.
+const { patchGorbusMain, patchGorbusGE101, patchGorbusGE101CSS } = await import('./scripts/ge-1.0.3-camera-runtime.mjs');
+main = patchGorbusMain(readFileSync(mainPath, 'utf8'));
+writeFileSync(mainPath, main);
+const ge103SourcePath = resolve('src/ge101.js');
+const ge103Source = patchGorbusGE101(readFileSync(ge103SourcePath, 'utf8'));
+writeFileSync(ge103SourcePath, ge103Source);
+const ge103CssPath = resolve('src/ge101.css');
+const ge103Css = patchGorbusGE101CSS(readFileSync(ge103CssPath, 'utf8'));
+writeFileSync(ge103CssPath, ge103Css);
+console.log('Gorbus Engine GE 1.0.3: Luau game camera, mouse capture/deltas and camera component enabled.');
