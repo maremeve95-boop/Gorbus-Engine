@@ -284,3 +284,56 @@ writeFileSync(ge104CssPath, patchGE104CSS(readFileSync(ge104CssPath, 'utf8')));
 const ge104HtmlPath = resolve('index.html');
 writeFileSync(ge104HtmlPath, readFileSync(ge104HtmlPath, 'utf8').replaceAll('Gorbus Engine 1.0.3', 'Gorbus Engine 1.0.4').replaceAll('GE 1.0.3', 'GE 1.0.4'));
 console.log('Gorbus Engine GE 1.0.4: camera-relative WASD, native capsule colliders, sensors, character controller, AI scene context, snapping and interactive console diagnostics enabled.');
+
+
+// GE 2.0.0 Patched: restore the source overlay in a deterministic, allow-listed way.
+const ge200OverlayFiles = [
+  'ge200-overlay-01.br64',
+  'ge200-overlay-02.br64',
+  'ge200-overlay-03.br64',
+  'ge200-overlay-04.br64',
+  'ge200-overlay-05a.br64',
+  'ge200-overlay-05b.br64',
+  'ge200-overlay-05c.br64',
+  'ge200-overlay-06a.br64',
+  'ge200-overlay-06b.br64',
+  'ge200-overlay-06c.br64'
+].map((file) => readFileSync(resolve('build-assets', file), 'utf8').trim());
+const ge200Overlay = JSON.parse(
+  brotliDecompressSync(Buffer.from(ge200OverlayFiles.join(''), 'base64')).toString('utf8')
+);
+const ge200AllowedFiles = new Set([
+  'scripts/ge-2.0.0-engine.mjs',
+  'scripts/verify-ge-2.0.0.mjs',
+  'src/gorbus-v2-studio.js',
+  'build-assets/gorbus-enhancements.base.js',
+  'build-assets/gorbus-enhancements.base.css',
+  'RELEASE_NOTES_2.0.0_PATCHED.md',
+  'docs/GE_2.1_ROADMAP.md'
+]);
+for (const [relativePath, fileContent] of Object.entries(ge200Overlay)) {
+  if (!ge200AllowedFiles.has(relativePath) || typeof fileContent !== 'string') {
+    throw new Error('Unexpected GE 2.0.0 overlay entry: ' + relativePath);
+  }
+  const target = resolve(relativePath);
+  mkdirSync(dirname(target), { recursive: true });
+  writeFileSync(target, fileContent);
+}
+
+// Apply GE 2.0.0 after the existing 1.0.1–1.0.4 layers have been restored.
+const { patchGE200Main, patchGE200HTML, patchGE200CSS, patchGE200Enhancements } =
+  await import('./scripts/ge-2.0.0-engine.mjs');
+main = patchGE200Main(readFileSync(mainPath, 'utf8'));
+writeFileSync(mainPath, main);
+const ge200HtmlPath = resolve('index.html');
+writeFileSync(ge200HtmlPath, patchGE200HTML(readFileSync(ge200HtmlPath, 'utf8')));
+
+// Restore pristine entrypoints on each run before applying the patch, so repeated
+// dev/build/check executions do not duplicate listeners or styles.
+const ge200CssPath = resolve('src/gorbus-enhancements.css');
+const ge200AccountPath = resolve('src/gorbus-enhancements.js');
+writeFileSync(ge200CssPath, readFileSync(resolve('build-assets', 'gorbus-enhancements.base.css'), 'utf8'));
+writeFileSync(ge200AccountPath, readFileSync(resolve('build-assets', 'gorbus-enhancements.base.js'), 'utf8'));
+writeFileSync(ge200CssPath, patchGE200CSS(readFileSync(ge200CssPath, 'utf8')));
+writeFileSync(ge200AccountPath, patchGE200Enhancements(readFileSync(ge200AccountPath, 'utf8')));
+console.log('Gorbus Engine 2.0.0 Patched: 2D/3D, fixed NVIDIA Nemotron, animated models, basic rig, procedural modeling, mechanics and runtime tests enabled.');
