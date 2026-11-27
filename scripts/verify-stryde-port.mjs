@@ -12,6 +12,7 @@ const checks = [
   ['main Luau lifecycle is implemented', ['function onStart()', 'function onUpdate(dt: number)', 'function onStop()'].every(token => source.includes(token))],
   ['native first-person controls are used', source.includes('Gorbus.controlCharacter(speed, 6.8, PLAYER)') && source.includes('Gorbus.getMouseDelta()')],
   ['native mouse buttons power firing and aiming', source.includes('Gorbus.isMouseButtonDown(0)') && source.includes('Gorbus.isMouseButtonDown(2)')],
+  ['native game HUD reports score, timer, weapon and results', source.includes('Gorbus.setGameHUD(') && source.includes('Gorbus.clearGameHUD()') && source.includes('Gorbus.showGameMessage(')],
   ['first-person player mesh is hidden only for gameplay and restored on stop', source.includes('Gorbus.setObjectVisible(PLAYER, false)') && source.includes('Gorbus.setObjectVisible(PLAYER, true)') && player?.visible === true],
   ['raycast-based target practice is implemented', source.includes('Gorbus.raycast(') && source.includes('function fireShot()')],
   ['60-second training round and restart are implemented', source.includes('local ROUND_SECONDS = 60') && source.includes('Gorbus.isKeyJustPressed("t")')],
