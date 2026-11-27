@@ -106,7 +106,7 @@ function selectObject(obj) {
 }`;
   main = replaceOnce(main, oldHierarchy, newHierarchy, 'hierarchy multi-select');
 
-  const oldPhysicsShape = \`function objectPhysicsShape(obj){
+  const oldPhysicsShape = `function objectPhysicsShape(obj){
   const mesh=obj.isMesh?obj:obj.children.find(c=>c.isMesh);
   if(!mesh?.geometry)return {type:'box',size:new THREE.Vector3(.5,.5,.5)};
   mesh.geometry.computeBoundingBox();
@@ -116,8 +116,8 @@ function selectObject(obj) {
   size.set(Math.max(.04,Math.abs(size.x)),Math.max(.04,Math.abs(size.y)),Math.max(.04,Math.abs(size.z)));
   const type=componentHas(obj,'Capsule Collider')?'capsule':(componentHas(obj,'Sphere Collider')?'sphere':'box');
   return {type,size};
-}\`;
-  const newPhysicsShape = \`function objectPhysicsShape(obj){
+}`;
+  const newPhysicsShape = `function objectPhysicsShape(obj){
   const fallback={type:'box',size:new THREE.Vector3(.5,.5,.5),center:new THREE.Vector3()};
   if(!obj?.isObject3D)return fallback;
   obj.updateWorldMatrix(true,true);
@@ -147,12 +147,12 @@ function selectObject(obj) {
   size.set(Math.max(.04,Math.abs(size.x)),Math.max(.04,Math.abs(size.y)),Math.max(.04,Math.abs(size.z)));
   const type=componentHas(obj,'Capsule Collider')?'capsule':(componentHas(obj,'Sphere Collider')?'sphere':'box');
   return {type,size,center};
-}\`;
+}`;
   main = replaceOnce(main, oldPhysicsShape, newPhysicsShape, 'nested imported-model collider bounds');
 
-  const oldColliderOffset = \`      :(shape.type==='sphere'?RAPIER.ColliderDesc.ball(Math.max(shape.size.x,shape.size.y,shape.size.z)):RAPIER.ColliderDesc.cuboid(shape.size.x,shape.size.y,shape.size.z));\`;
-  const newColliderOffset = \`      :(shape.type==='sphere'?RAPIER.ColliderDesc.ball(Math.max(shape.size.x,shape.size.y,shape.size.z)):RAPIER.ColliderDesc.cuboid(shape.size.x,shape.size.y,shape.size.z));
-    colliderDesc.setTranslation(shape.center.x,shape.center.y,currentProjectMode==='2d'?0:shape.center.z);\`;
+  const oldColliderOffset = `      :(shape.type==='sphere'?RAPIER.ColliderDesc.ball(Math.max(shape.size.x,shape.size.y,shape.size.z)):RAPIER.ColliderDesc.cuboid(shape.size.x,shape.size.y,shape.size.z));`;
+  const newColliderOffset = `      :(shape.type==='sphere'?RAPIER.ColliderDesc.ball(Math.max(shape.size.x,shape.size.y,shape.size.z)):RAPIER.ColliderDesc.cuboid(shape.size.x,shape.size.y,shape.size.z));
+    colliderDesc.setTranslation(shape.center.x,shape.center.y,currentProjectMode==='2d'?0:shape.center.z);`;
   main = replaceOnce(main, oldColliderOffset, newColliderOffset, 'runtime collider local center');
 
   const pointerAnchor = `if(hits.length){let obj=hits[0].object;while(obj.parent&&obj.parent!==scene)obj=obj.parent;selectObject(editable.includes(obj)?obj:null);}else if(currentTool==='select')selectObject(null);`;
