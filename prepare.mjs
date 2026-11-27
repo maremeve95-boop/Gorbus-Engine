@@ -262,3 +262,25 @@ let ge103Html = readFileSync('index.html', 'utf8');
 ge103Html = ge103Html.replaceAll('Gorbus Engine 1.0.1', 'Gorbus Engine 1.0.3').replaceAll('GE 1.0.1', 'GE 1.0.3');
 writeFileSync('index.html', ge103Html);
 console.log('Gorbus Engine GE 1.0.3: Luau game camera, mouse capture/deltas and camera component enabled.');
+
+// GE 1.0.4: restore compressed gameplay/editor modules and apply the patch after earlier GE layers.
+const ge104PatchRaw = brotliDecompressSync(Buffer.from(readFileSync(resolve('build-assets', 'ge104-source-patch.br64'), 'utf8').trim(), 'base64'));
+const ge104PatchFiles = JSON.parse(ge104PatchRaw.toString('utf8'));
+for (const [relativePath, fileContent] of Object.entries(ge104PatchFiles)) {
+  if (!['scripts/ge-1.0.4-engine.mjs', 'scripts/verify-ge-1.0.4.mjs', 'examples/first-person-camera.luau'].includes(relativePath) || typeof fileContent !== 'string') {
+    throw new Error('Unexpected GE 1.0.4 patch entry: ' + relativePath);
+  }
+  const target = resolve(relativePath);
+  mkdirSync(dirname(target), { recursive: true });
+  writeFileSync(target, fileContent);
+}
+const { patchGE104Main, patchGE104Editor, patchGE104CSS } = await import('./scripts/ge-1.0.4-engine.mjs');
+main = patchGE104Main(readFileSync(mainPath, 'utf8'));
+writeFileSync(mainPath, main);
+const ge104EditorPath = resolve('src/ge101.js');
+writeFileSync(ge104EditorPath, patchGE104Editor(readFileSync(ge104EditorPath, 'utf8')));
+const ge104CssPath = resolve('src/ge101.css');
+writeFileSync(ge104CssPath, patchGE104CSS(readFileSync(ge104CssPath, 'utf8')));
+const ge104HtmlPath = resolve('index.html');
+writeFileSync(ge104HtmlPath, readFileSync(ge104HtmlPath, 'utf8').replaceAll('Gorbus Engine 1.0.3', 'Gorbus Engine 1.0.4').replaceAll('GE 1.0.3', 'GE 1.0.4'));
+console.log('Gorbus Engine GE 1.0.4: camera-relative WASD, native capsule colliders, sensors, character controller, AI scene context, snapping and interactive console diagnostics enabled.');
