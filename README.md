@@ -56,6 +56,15 @@ Las propuestas nuevas se están organizando en un roadmap separado para distingu
 
 Estas funciones son objetivos de desarrollo, no capacidades que GE 2.0.0 ya prometa tener. El diseño técnico, prioridades, pruebas y límites están en [docs/GE_2.1_ROADMAP.md](docs/GE_2.1_ROADMAP.md).
 
+## GE 2.1 Preview — herramientas de mundo
+
+- **Selección múltiple:** en Hierarchy usa Ctrl/Cmd + clic para añadir o quitar objetos y Shift + clic para seleccionar un rango. En Scene, Ctrl/Cmd + clic también añade o quita el objeto bajo el cursor.
+- **Seleccionar todo / Limpiar selección:** accesos directos en el panel Diseño de mundos.
+- **Colocar con física:** ejecuta una simulación Rapier temporal sobre los objetos seleccionados (hasta 300 por operación), usa los colliders de objetos no seleccionados como soportes cuando existen y aplica las posiciones finales sin iniciar Play. La operación respeta el plano XY en proyectos 2D.
+- El asentamiento usa colliders simplificados de caja/esfera/cápsula a partir de los bounds del modelo. Los meshes complejos/terrenos y los rigs no se convierten en colisiones exactas durante este bake; revisa el resultado antes de continuar.
+
+La restauración aplica estas herramientas después de GE 2.0.0 en cada ejecución de `npm run dev`, `npm run check` y `npm run build`. El verificador `scripts/verify-ge-2.1-world-tools.mjs` comprueba la presencia de los controles y rutas de código; no sustituye una prueba visual de selección ni un test manual de equilibrio con escenas reales.
+
 ## Importar modelos
 
 1. Exporta el modelo como `.glb` o `.gltf`.
