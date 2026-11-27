@@ -163,8 +163,13 @@ function selectObject(obj) {
   const helper = `async function autoSettleObjects(objects = [...selectedObjects], options = {}) {
   if(isPlaying)throw new Error('Detén Play antes de colocar objetos.');
   const hasMeshGeometry=obj=>{let found=false;obj?.traverse?.(child=>{if(child.isMesh&&child.geometry&&child.visible)found=true;});return found;};
-  const targets=[...new Set((objects||[]).filter(obj=>editable.includes(obj)&&kindOf(obj)!=='LIGHT'&&hasMeshGeometry(obj)))];
-  if(!targets.length)throw new Error('Selecciona al menos un objeto con geometría.');
+  const isPinnedForPlacement=obj=>{
+    const hasCollider=componentHas(obj,'Box Collider')||componentHas(obj,'Sphere Collider')||componentHas(obj,'Capsule Collider')||componentHas(obj,'Rigidbody');
+    const configuredType=obj.userData.physics?.type||(componentHas(obj,'Rigidbody')?'dynamic':'fixed');
+    return obj.userData.prefabType==='terrain'||(hasCollider&&configuredType==='fixed');
+  };
+  const targets=[...new Set((objects||[]).filter(obj=>editable.includes(obj)&&kindOf(obj)!=='LIGHT'&&!isPinnedForPlacement(obj)&&hasMeshGeometry(obj)))];
+  if(!targets.length)throw new Error('Selecciona geometría móvil. Los colliders fijos y el terreno permanecen anclados; añade Rigidbody dinámico para mover un objeto con collider.');
   if(targets.length>300)throw new Error('La colocación por lotes admite hasta 300 objetos por operación. Divide la selección en grupos.');
   await ensureRapier();
   const is2d=currentProjectMode==='2d';
@@ -255,7 +260,7 @@ export function patchGE21Studio(original) {
   const worldSection = `    <section class="ge-v2-section" id="geV21WorldSection">
       <div class="ge-v2-head"><span>DISEÑO DE MUNDOS</span><span class="ge-v21-world-count" id="geV21SelectionCount">0 seleccionados</span></div>
       <div class="ge-v2-body">
-        <p class="ge-v2-note">Selecciona varios objetos desde Hierarchy con Ctrl/Cmd o Shift. Después puedes seleccionar toda la escena o dejar que Rapier los coloque y estabilice en un cálculo previo, sin iniciar Play.</p>
+        <p class="ge-v2-note">Selecciona varios objetos desde Hierarchy con Ctrl/Cmd o Shift. Los colliders fijos y el terreno quedan anclados; los demás objetos se colocan y estabilizan con Rapier sin iniciar Play.</p>
         <div class="ge-v21-world-actions">
           <button class="ge-v2-btn" id="geV21SelectAll">Seleccionar todo</button>
           <button class="ge-v2-btn" id="geV21ClearSelection">Limpiar selección</button>
