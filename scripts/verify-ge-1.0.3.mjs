@@ -5,6 +5,7 @@ import { LuauState } from 'luau-web';
 const main = readFileSync('src/main.js', 'utf8');
 const camera = readFileSync('src/ge101.js', 'utf8');
 const css = readFileSync('src/ge101.css', 'utf8');
+const sample = readFileSync('examples/first-person-camera.luau', 'utf8');
 
 for (const api of [
   'getObjectPosition:', 'lockMouse:', 'getMouseDelta:',
@@ -21,6 +22,7 @@ assert.ok(camera.includes('function consumeMouseDelta()'));
 assert.ok(camera.includes('function beginPlay()'));
 assert.ok(camera.includes('function endPlay()'));
 assert.ok(css.includes('.ge101-pointer-lock-prompt'));
+for (const api of ['Gorbus.lockMouse(true)', 'Gorbus.getMouseDelta()', 'Gorbus.setCameraPosition(', 'Gorbus.setCameraRotation(', 'Gorbus.getObjectPosition(', 'math.sin(', 'math.cos(']) assert.ok(sample.includes(api), 'First-person example missing ' + api);
 
 const state = await LuauState.createAsync({});
 const mathProbe = state.loadstring(
