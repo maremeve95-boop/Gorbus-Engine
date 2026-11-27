@@ -357,10 +357,30 @@ console.log('Gorbus Engine GE 2.1 Preview: multi-selection, physics placement, m
 const ge210Parts = Array.from({ length: 12 }, (_, index) =>
   readFileSync(resolve('build-assets', `ge210-release-${String(index + 1).padStart(2, '0')}.br64`), 'utf8').trim()
 );
-const ge210Compressed = Buffer.from(ge210Parts.join(''), 'base64');
-const ge210Digest = createHash('sha256').update(ge210Compressed).digest('hex');
-if (ge210Digest !== '515dafaa3f94d798da4365f041398ee652d9e7a215b12603dd3770b9e0e18387') {
-  throw new Error('Gorbus Engine 2.1.0 release archive failed SHA-256 integrity verification.');
+const ge210ExpectedDigest = '515dafaa3f94d798da4365f041398ee652d9e7a215b12603dd3770b9e0e18387';
+let ge210Compressed = Buffer.from(ge210Parts.join(''), 'base64');
+let ge210Digest = createHash('sha256').update(ge210Compressed).digest('hex');
+
+// A text overlay chunk can pick up one extra character when copied between
+// systems. Only attempt a one-character correction in chunks whose lengths
+// are not base64-aligned, and accept a candidate solely when SHA-256 matches.
+if (ge210Digest !== ge210ExpectedDigest) {
+  const misaligned = ge210Parts.map((part, index) => ({ part, index })).filter(item => item.part.length % 4 !== 0);
+  let repaired = null;
+  for (const { part, index } of misaligned) {
+    for (let offset = 0; offset < part.length; offset++) {
+      const candidateParts = [...ge210Parts];
+      candidateParts[index] = part.slice(0, offset) + part.slice(offset + 1);
+      const candidateBytes = Buffer.from(candidateParts.join(''), 'base64');
+      if (createHash('sha256').update(candidateBytes).digest('hex') === ge210ExpectedDigest) {
+        if (repaired) throw new Error('Multiple release archive repairs matched the SHA-256 digest.');
+        repaired = candidateBytes;
+      }
+    }
+  }
+  if (!repaired) throw new Error('Gorbus Engine 2.1.0 release archive failed SHA-256 integrity verification.');
+  ge210Compressed = repaired;
+  ge210Digest = ge210ExpectedDigest;
 }
 const ge210Files = JSON.parse(brotliDecompressSync(ge210Compressed).toString('utf8'));
 const ge210AllowedFiles = new Set([
