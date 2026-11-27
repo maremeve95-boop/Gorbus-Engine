@@ -99,10 +99,16 @@ export function patchGE21RuntimeHUD(original) {
     );
   }
   if (!main.includes('Gorbus.setGameHUD(seconds,score,accuracy,modeName,activatedNodes,rank)')) {
+    const visibilityDoc = [
+      '- Gorbus.setObjectVisible(name,visible): muestra u oculta la malla sin retirar el cuerpo físico que se creó al iniciar Play.',
+      '- Gorbus.setObjectVisible(name,visible): muestra u oculta la malla sin retirar el cuerpo físico que ya se creó al iniciar Play.'
+    ];
+    const visibilityAnchor = visibilityDoc.find(line => main.includes(line));
+    if (!visibilityAnchor) throw new Error('GE 2.1 runtime HUD patch could not find the documented setObjectVisible API.');
     main = replaceOnce(
       main,
-      '- Gorbus.setObjectVisible(name,visible): muestra u oculta la malla sin retirar el cuerpo físico que se creó al iniciar Play.',
-      '- Gorbus.setObjectVisible(name,visible): muestra u oculta la malla sin retirar el cuerpo físico que se creó al iniciar Play.\n- Gorbus.setGameHUD(seconds,score,accuracy,modeName,activatedNodes,rank): muestra el HUD arcade del viewport con el modo de escaneo y los datos de partida.\n- Gorbus.showGameMessage(message,duration): muestra un aviso breve en el HUD.\n- Gorbus.clearGameHUD(): retira el HUD al terminar el juego.',
+      visibilityAnchor,
+      visibilityAnchor + '\n- Gorbus.setGameHUD(seconds,score,accuracy,modeName,activatedNodes,rank): muestra el HUD arcade del viewport con el modo de escaneo y los datos de partida.\n- Gorbus.showGameMessage(message,duration): muestra un aviso breve en el HUD.\n- Gorbus.clearGameHUD(): retira el HUD al terminar el juego.',
       'document runtime game HUD API'
     );
   }
