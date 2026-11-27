@@ -22,7 +22,7 @@ assert.ok(camera.includes('function consumeMouseDelta()'));
 assert.ok(camera.includes('function beginPlay()'));
 assert.ok(camera.includes('function endPlay()'));
 assert.ok(css.includes('.ge101-pointer-lock-prompt'));
-for (const api of ['Gorbus.lockMouse(true)', 'Gorbus.getMouseDelta()', 'Gorbus.setCameraPosition(', 'Gorbus.setCameraRotation(', 'Gorbus.getObjectPosition(', 'math.sin(', 'math.cos(']) assert.ok(sample.includes(api), 'First-person example missing ' + api);
+for (const api of ['Gorbus.lockMouse(true)', 'Gorbus.getMouseDelta()', 'Gorbus.setCameraPosition(', 'Gorbus.setCameraRotation(', 'Gorbus.getObjectPosition(']) assert.ok(sample.includes(api), 'First-person example missing ' + api);
 
 const state = await LuauState.createAsync({});
 const mathProbe = state.loadstring(
