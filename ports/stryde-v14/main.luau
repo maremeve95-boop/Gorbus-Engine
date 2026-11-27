@@ -200,6 +200,9 @@ function onStart()
         end
     end
 
+    -- La física ya fue construida antes de onStart; ocultamos solo el modelo visual
+    -- para evitar que la cápsula del jugador tape la cámara en primera persona.
+    Gorbus.setObjectVisible(PLAYER, false)
     Gorbus.setCameraMode("game", 0.1)
     Gorbus.lockMouse(true)
     local player = Gorbus.getObjectPosition(PLAYER)
@@ -289,5 +292,6 @@ end
 
 function onStop()
     Gorbus.lockMouse(false)
+    Gorbus.setObjectVisible(PLAYER, true)
     Gorbus.log("STRYDE: sesión detenida.")
 end
