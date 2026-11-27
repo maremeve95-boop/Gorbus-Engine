@@ -13,6 +13,7 @@ const checks = [
   ['temporary Rapier world for batch placement', main.includes('async function autoSettleObjects') && main.includes('new RAPIER.World') && main.includes('world.step()')],
   ['batch placement uses selected objects and has a safe batch cap', main.includes('objects = [...selectedObjects]') && main.includes('targets.length>300')],
   ['nested imported models are discovered recursively', main.includes('const hasMeshGeometry=obj=>') && main.includes('obj?.traverse?.(child=>{if(child.isMesh&&child.geometry&&child.visible)found=true;})')],
+  ['fixed colliders and terrain stay anchored during batch placement', main.includes('const isPinnedForPlacement=obj=>') && main.includes('!isPinnedForPlacement(obj)') && main.includes("obj.userData.prefabType==='terrain'")],
   ['physics bounds include every nested mesh in object-local space', main.includes('relative.multiplyMatrices(inverseRoot,child.matrixWorld)') && main.includes('bounds.expandByPoint(point)') && main.includes('return {type,size,center}')],
   ['runtime and batch colliders honor local geometry centers', main.includes('colliderDesc.setTranslation(shape.center.x') && main.includes('desc.setTranslation(shape.center.x')],
   ['existing colliders are used as static supports', main.includes("componentHas(obj,'Box Collider')") && main.includes("componentHas(obj,'Capsule Collider')")],
