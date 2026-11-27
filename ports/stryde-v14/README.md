@@ -9,6 +9,7 @@ Primer corte nativo del proyecto STRYDE v1.4, preparado para Gorbus Engine. Esta
 - Cámara controlada por ratón y movimiento nativo de Gorbus.
 - Cuatro perfiles de armas ficticias con daños y cadencias diferenciados.
 - Seis objetivos con salud, tres objetivos móviles y reaparición.
+- HUD nativo del viewport con cronómetro, puntos, precisión, eliminaciones, arma y rango.
 - Ronda de entrenamiento de 60 segundos, puntuación, precisión y rango final.
 - Munición infinita, igual que el modo Entrenamiento original.
 
@@ -21,6 +22,7 @@ Primer corte nativo del proyecto STRYDE v1.4, preparado para Gorbus Engine. Esta
 - **Clic izquierdo:** disparar.
 - **Clic derecho:** apuntar (sensibilidad reducida).
 - **1–4:** cambiar perfil de arma.
+- El HUD muestra la puntuación y los avisos de impacto durante la partida.
 - **Tab:** mostrar marcador en la consola.
 - **T:** reiniciar la ronda.
 
