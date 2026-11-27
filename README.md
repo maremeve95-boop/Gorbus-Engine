@@ -180,3 +180,12 @@ Pointer Lock depende de permisos y soporte del navegador; el botón de autorizac
 
 ### Comprobaciones
 La CI comprueba restauración y sintaxis de los módulos, creación de una cápsula y un sensor con Rapier, orientación de los vectores de movimiento para cuatro ángulos de cámara, compilación del ejemplo Luau y las funciones matemáticas estándar. Estas pruebas no sustituyen una prueba manual del personaje y Pointer Lock en el navegador.
+
+
+## Gorbus AI 2.0 — benchmark de construcción
+
+Se añade una prueba práctica para evaluar la capacidad de Gorbus AI de construir proyectos 2D y 3D, asignar scripts por objeto, trabajar con modelado y RIG, configurar herramientas y ejecutar pruebas verificables.
+
+El benchmark obliga al asistente a utilizar las APIs reales de la versión abierta, distinguir compilación de pruebas interactivas y marcar las funciones ausentes como bloqueadas o no disponibles. No presupone que todas las capacidades descritas estén implementadas en GE 1.0.4.
+
+Consulta [docs/GORBUS_AI_BENCHMARK_2_0.md](docs/GORBUS_AI_BENCHMARK_2_0.md) para copiar el prompt completo.
