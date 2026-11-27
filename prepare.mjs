@@ -405,3 +405,9 @@ const ge210CssPath = resolve('styles.css');
 writeFileSync(ge210CssPath, patchGE210CSS(readFileSync(ge210CssPath, 'utf8')));
 console.log('Gorbus Engine 2.1.0 Release Preview: script tabs, HTML migration, FPS capsule, project library, procedural assets, ECS-lite, Crowd Bake, keyframes and UI scaffolds enabled.');
 
+// Gorbus Engine 3.0.0: runtime profiler, transform inspection and project diagnostics.
+const { patchGE300Main } = await import('./scripts/ge-3.0.0-profiler.mjs');
+main = patchGE300Main(readFileSync(mainPath, 'utf8'));
+writeFileSync(mainPath, main);
+console.log('Gorbus Engine 3.0.0: runtime profiler, scene metrics and runtime transform APIs enabled.');
+
