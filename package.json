@@ -1,6 +1,6 @@
 {
   "name": "gorbus-engine",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -10,8 +10,8 @@
     "dev": "node prepare.mjs && vite --host 0.0.0.0",
     "build": "node prepare.mjs && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "check": "node --check prepare.mjs && node --check scripts/ge-2.1-world-tools.mjs && node --check scripts/verify-ge-2.1-world-tools.mjs && node --check scripts/ge-2.1-mouse-input.mjs && node --check scripts/ge-2.1-runtime-hud.mjs && node --check scripts/verify-ge-2.1-mouse-input.mjs && node --check scripts/verify-ge-2.1-runtime-hud.mjs && node --check scripts/verify-stryde-port.mjs && node --check scripts/ge-1.0.2-ai.mjs && node --check scripts/ge-1.0.3-camera-runtime.mjs && node --check scripts/verify-ge-1.0.3.mjs && node prepare.mjs && node --check scripts/ge-1.0.4-engine.mjs && node --check scripts/verify-ge-1.0.4.mjs && node --check scripts/ge-2.0.0-engine.mjs && node --check scripts/verify-ge-2.0.0.mjs && node --check src/main.js && node --check src/ge101.js && node --check src/gorbus-v2-studio.js && node --check src/gorbus-enhancements.js && node --check src/gorbus-ai-attachments.js && node scripts/verify-ge-1.0.3.mjs && node scripts/verify-ge-1.0.4.mjs && node scripts/verify-ge-2.0.0.mjs && node scripts/verify-ge-2.1-world-tools.mjs && node scripts/verify-ge-2.1-mouse-input.mjs && node scripts/verify-ge-2.1-runtime-hud.mjs && node scripts/verify-stryde-port.mjs",
-    "check:static": "node --check prepare.mjs && node --check scripts/ge-2.1-world-tools.mjs && node --check scripts/verify-ge-2.1-world-tools.mjs && node --check scripts/ge-2.1-mouse-input.mjs && node --check scripts/ge-2.1-runtime-hud.mjs && node --check scripts/verify-ge-2.1-mouse-input.mjs && node --check scripts/verify-ge-2.1-runtime-hud.mjs && node --check scripts/verify-stryde-port.mjs && node prepare.mjs && node --check scripts/ge-2.0.0-engine.mjs && node --check scripts/verify-ge-2.0.0.mjs && node --check src/main.js && node --check src/ge101.js && node --check src/gorbus-v2-studio.js && node --check src/gorbus-enhancements.js && node scripts/verify-ge-2.0.0.mjs && node scripts/verify-ge-2.1-world-tools.mjs && node scripts/verify-ge-2.1-mouse-input.mjs && node scripts/verify-ge-2.1-runtime-hud.mjs && node scripts/verify-stryde-port.mjs"
+    "check": "node --check prepare.mjs && node --check scripts/ge-2.1-world-tools.mjs && node --check scripts/verify-ge-2.1-world-tools.mjs && node --check scripts/ge-2.1-mouse-input.mjs && node --check scripts/ge-2.1-runtime-hud.mjs && node --check scripts/verify-ge-2.1-mouse-input.mjs && node --check scripts/verify-ge-2.1-runtime-hud.mjs && node --check scripts/verify-stryde-port.mjs && node --check scripts/ge-1.0.2-ai.mjs && node --check scripts/ge-1.0.3-camera-runtime.mjs && node --check scripts/verify-ge-1.0.3.mjs && node prepare.mjs && node --check scripts/ge-2.1.0-release.mjs && node --check scripts/verify-ge-2.1.0.mjs && node --check scripts/ge-1.0.4-engine.mjs && node --check scripts/verify-ge-1.0.4.mjs && node --check scripts/ge-2.0.0-engine.mjs && node --check scripts/verify-ge-2.0.0.mjs && node --check src/main.js && node --check src/ge101.js && node --check src/gorbus-v2-studio.js && node --check src/gorbus-enhancements.js && node --check src/gorbus-ai-attachments.js && node scripts/verify-ge-1.0.3.mjs && node scripts/verify-ge-1.0.4.mjs && node scripts/verify-ge-2.0.0.mjs && node scripts/verify-ge-2.1-world-tools.mjs && node scripts/verify-ge-2.1-mouse-input.mjs && node scripts/verify-ge-2.1-runtime-hud.mjs && node scripts/verify-stryde-port.mjs && node scripts/verify-ge-2.1.0.mjs",
+    "check:static": "node --check prepare.mjs && node --check scripts/ge-2.1-world-tools.mjs && node --check scripts/verify-ge-2.1-world-tools.mjs && node --check scripts/ge-2.1-mouse-input.mjs && node --check scripts/ge-2.1-runtime-hud.mjs && node --check scripts/verify-ge-2.1-mouse-input.mjs && node --check scripts/verify-ge-2.1-runtime-hud.mjs && node --check scripts/verify-stryde-port.mjs && node prepare.mjs && node --check scripts/ge-2.0.0-engine.mjs && node --check scripts/verify-ge-2.0.0.mjs && node --check src/main.js && node --check src/ge101.js && node --check src/gorbus-v2-studio.js && node --check src/gorbus-enhancements.js && node scripts/verify-ge-2.0.0.mjs && node scripts/verify-ge-2.1-world-tools.mjs && node scripts/verify-ge-2.1-mouse-input.mjs && node scripts/verify-ge-2.1-runtime-hud.mjs && node scripts/verify-stryde-port.mjs && node scripts/verify-ge-2.1.0.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",
@@ -21,5 +21,5 @@
   "devDependencies": {
     "vite": "^7.1.0"
   },
-  "description": "Gorbus Engine 2.0.0 Patched: editor 2D/3D, per-object Luau scripts, animated GLB import, basic rigging, procedural modeling, physics mechanics, fixed NVIDIA Nemotron AI, and runtime diagnostics."
+  "description": "Gorbus Engine 2.1.0 Preview: multi-file Luau/Web scripting, HTML-to-Luau migration assistant, first-person capsule controller, project library, procedural assets, ECS-lite, instanced crowd bake, keyframes and responsive UI scaffolds."
 }
