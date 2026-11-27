@@ -11,8 +11,8 @@ export function patchGE21Main(original) {
   let main = original;
   main = replaceOnce(
     main,
-    "let editable = [];\\nlet selected = null;\\nlet currentTool = 'select';",
-    "let editable = [];\\nlet selected = null;\\nlet selectedObjects = new Set();\\nlet hierarchySelectionAnchor = null;\\nlet currentTool = 'select';",
+    "let editable = [];\nlet selected = null;\nlet currentTool = 'select';",
+    "let editable = [];\nlet selected = null;\nlet selectedObjects = new Set();\nlet hierarchySelectionAnchor = null;\nlet currentTool = 'select';",
     'multi-select state'
   );
 
@@ -249,8 +249,8 @@ export function patchGE21Studio(original) {
 
   studio = replaceOnce(
     studio,
-    '  function refreshSelection() {\\n    const root = getRoot();',
-    '  function refreshSelection() {\\n    const root = getRoot();\\n    const worldCount = $(\\'geV21SelectionCount\\');\\n    if (worldCount) worldCount.textContent = (engine.selectedObjects?.length || 0) + \\' seleccionados\\';\\n    const settleButton = $(\\'geV21Settle\\');\\n    if (settleButton) settleButton.disabled = !(engine.selectedObjects?.length) || !!engine.isPlaying;',
+    '  function refreshSelection() {\n    const root = getRoot();',
+    '  function refreshSelection() {\n    const root = getRoot();\n    const worldCount = $(\\'geV21SelectionCount\\');\n    if (worldCount) worldCount.textContent = (engine.selectedObjects?.length || 0) + \\' seleccionados\\';\n    const settleButton = $(\\'geV21Settle\\');\n    if (settleButton) settleButton.disabled = !(engine.selectedObjects?.length) || !!engine.isPlaying;',
     'selection-driven world tools state'
   );
   return studio;
