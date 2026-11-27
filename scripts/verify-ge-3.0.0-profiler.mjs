@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { patchGE300Main } from './ge-3.0.0-profiler.mjs';
+const source=readFileSync('scripts/ge-3.0.0-profiler.mjs','utf8');
+assert.ok(source.includes('function sampleGorbusProfiler(now)'));
+assert.ok(source.includes('renderer.info'));
+assert.ok(source.includes('setObjectScale'));
+assert.ok(source.includes('setObjectRotation'));
+const fixture=['const THREE={MathUtils:{radToDeg:v=>v,degToRad:v=>v}};','const renderer={info:{render:{calls:1,triangles:2},memory:{geometries:3,textures:4}}};','const editable=[];','function findObject(){return null;}','function createLuauBridge(scriptObjectName=null){return { clearGameHUD:()=>clearGorbusRuntimeHUD(), };}','- Gorbus.clearGameHUD(): retira el HUD al terminar el juego.'].join('\n');
+const patched=patchGE300Main(fixture);
+for(const token of ['getPerformanceStatsJSON:','setProfilerVisible:','getObjectScale:','setObjectScale:','getObjectRotation:','setObjectRotation:','getSceneObjectCount:']) assert.ok(patched.includes(token),'Missing '+token);
+assert.equal(patchGE300Main(patched),patched,'Patch must be idempotent');
+console.log('GE 3.0.0 profiler: PASS — 7 runtime APIs, renderer metrics, idempotency.');
