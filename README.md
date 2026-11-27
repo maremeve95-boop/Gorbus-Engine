@@ -86,6 +86,10 @@ También incluye herramientas de mundo GE 2.1, assets procedurales, un registro 
 
 Consulta `docs/GE_2.1.0_RELEASE.md` para las funciones incluidas, las limitaciones y los pasos de validación.
 
+## Gorbus Engine 3.0.0 — Preview
+
+Esta rama añade un profiler runtime, APIs para consultar/modificar transforms durante Play y una herramienta CLI de diagnóstico estructural de proyectos. Consulta `docs/GE_3.0.0_PREVIEW.md` para ejemplos, límites y funciones pendientes. La Preview no afirma tener 110 subsistemas nuevos terminados.
+
 ## Gorbus Engine 3.0.0 — profiler y diagnóstico
 
 - **Profiler runtime:** muestra FPS aproximados, frame time, draw calls, triángulos, geometrías, texturas y memoria JS cuando el navegador expone esa métrica. Se activa desde Luau con `Gorbus.setProfilerVisible(true)` y se oculta con `false`.
