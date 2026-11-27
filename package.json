@@ -1,6 +1,6 @@
 {
   "name": "gorbus-engine",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "type": "module",
   "engines": {
@@ -10,7 +10,7 @@
     "dev": "node prepare.mjs && vite --host 0.0.0.0",
     "build": "node prepare.mjs && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "check": "node --check prepare.mjs && node --check scripts/ge-1.0.2-ai.mjs && node prepare.mjs && node --check ge101-prepare.mjs && node --check src/main.js && node --check src/gorbus-enhancements.js && node --check src/gorbus-ai-attachments.js && node --check src/ge101.js"
+    "check": "node --check prepare.mjs && node --check scripts/ge-1.0.2-ai.mjs && node --check scripts/ge-1.0.3-camera-runtime.mjs && node --check scripts/verify-ge-1.0.3.mjs && node prepare.mjs && node --check ge101-prepare.mjs && node --check src/main.js && node --check src/gorbus-enhancements.js && node --check src/gorbus-ai-attachments.js && node --check src/ge101.js && node scripts/verify-ge-1.0.3.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",
@@ -20,5 +20,5 @@
   "devDependencies": {
     "vite": "^7.1.0"
   },
-  "description": "Gorbus Engine GE 1.0.2: live Gorbus AI script editing, text/code attachments, Luau scripting, Rapier physics and Unity-style editor."
+  "description": "Gorbus Engine GE 1.0.3: Luau-controlled game cameras, pointer lock and mouse deltas, Camera components, verified native math library, live AI editing and Rapier physics."
 }
