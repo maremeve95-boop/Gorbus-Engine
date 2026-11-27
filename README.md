@@ -107,7 +107,9 @@ Para Vercel: instalación `npm install`, build `npm run build`, directorio de sa
 
 ## Port nativo de STRYDE v1.4
 
-Se ha iniciado un port nativo del juego STRYDE v1.4 en `ports/stryde-v14/`. El primer prototipo jugable es **Campo Orión / Entrenamiento**: escena `.gorbus`, script Luau, jugador FPS, controles de ratón, HUD nativo del viewport, cuatro perfiles de modo de escaneo y seis dianas. Es una primera fase; los otros modos, bots, tienda, progreso persistente, audio y HUD nativo aún no están portados. Consulta `ports/stryde-v14/README.md` para importarlo.
+Se ha iniciado un port nativo del juego STRYDE v1.4 en `ports/stryde-v14/`. La primera entrega es **Campo Orión / Entrenamiento**, adaptado como un reto arcade de escaneo: escena `.gorbus`, script Luau, jugador en primera persona, cuatro modos de escaneo, seis balizas (tres móviles) y HUD nativo del viewport con temporizador, puntos, precisión, balizas activadas y rango.
+
+Esta fase se centra en validar cámara, movimiento, raycast, física, balizas y puntuación. El HUD implementado es específico para esta ronda; todavía no existe un editor general de HUD/UI de juegos. Los otros modos originales, bots, tienda, cosméticos, progreso persistente, audio y red siguen pendientes. Consulta `ports/stryde-v14/README.md` para abrir la escena.
 
 ## Tecnologías
 
