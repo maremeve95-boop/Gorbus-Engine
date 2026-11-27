@@ -347,4 +347,6 @@ const { patchGE21Main, patchGE21Studio } = await import('./scripts/ge-2.1-world-
 writeFileSync(mainPath, patchGE21Main(readFileSync(mainPath, 'utf8')));
 const ge21StudioPath = resolve('src/gorbus-v2-studio.js');
 writeFileSync(ge21StudioPath, patchGE21Studio(readFileSync(ge21StudioPath, 'utf8')));
-console.log('Gorbus Engine GE 2.1 Preview: multi-selection and Rapier batch placement enabled.');
+const { patchGE21MouseInput } = await import('./scripts/ge-2.1-mouse-input.mjs');
+writeFileSync(mainPath, patchGE21MouseInput(readFileSync(mainPath, 'utf8')));
+console.log('Gorbus Engine GE 2.1 Preview: multi-selection, Rapier batch placement and Luau mouse buttons enabled.');
