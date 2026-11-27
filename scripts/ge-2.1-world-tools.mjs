@@ -61,14 +61,14 @@ function selectObject(obj) {
     const name=labelOf(obj); if(query && !name.toLowerCase().includes(query)) return;
     const row=document.createElement('div'); row.className='object-row'+(obj===selected?' selected':'');
     const glyph = kindOf(obj)==='LIGHT'?'☼':kindOf(obj)==='EMPTY'?'◇':obj.userData.gorbusType==='SPHERE'?'●':obj.userData.gorbusType==='PLANE'?'▱':'◈';
-    row.innerHTML=`<span class="tree-caret">›</span><span class="object-glyph">${glyph}</span><span class="row-name"></span><span class="row-kind">${kindOf(obj)}</span>`;
+    row.innerHTML=\`<span class="tree-caret">›</span><span class="object-glyph">\${glyph}</span><span class="row-name"></span><span class="row-kind">\${kindOf(obj)}</span>\`;
     row.querySelector('.row-name').textContent=name;
     row.addEventListener('click',()=>selectObject(obj));
     row.addEventListener('dblclick',()=>renameObject(obj));
     row.addEventListener('contextmenu',e=>{e.preventDefault();selectObject(obj);showContext(e.clientX,e.clientY,obj);});
     list.appendChild(row);
   });
-  $('objectCount').textContent=`${editable.length} objeto${editable.length===1?'':'s'}`;
+  $('objectCount').textContent=\`\${editable.length} objeto\${editable.length===1?'':'s'}\`;
   $('sceneCount').textContent=editable.length;
 }`;
   const newHierarchy = `function refreshHierarchy() {
@@ -79,7 +79,7 @@ function selectObject(obj) {
     const name=labelOf(obj);
     const row=document.createElement('div'); row.className='object-row'+(selectedObjects.has(obj)?' selected':'');
     const glyph = kindOf(obj)==='LIGHT'?'☼':kindOf(obj)==='EMPTY'?'◇':obj.userData.gorbusType==='SPHERE'?'●':obj.userData.gorbusType==='PLANE'?'▱':'◈';
-    row.innerHTML=`<span class="tree-caret">›</span><span class="object-glyph">${glyph}</span><span class="row-name"></span><span class="row-kind">${kindOf(obj)}</span>`;
+    row.innerHTML=\`<span class="tree-caret">›</span><span class="object-glyph">\${glyph}</span><span class="row-name"></span><span class="row-kind">\${kindOf(obj)}</span>\`;
     row.querySelector('.row-name').textContent=name;
     row.title='Clic: seleccionar · Ctrl/Cmd: añadir/quitar · Shift: seleccionar rango';
     row.addEventListener('click',event=>{
@@ -101,7 +101,7 @@ function selectObject(obj) {
     row.addEventListener('contextmenu',e=>{e.preventDefault();selectObject(obj);showContext(e.clientX,e.clientY,obj);});
     list.appendChild(row);
   });
-  $('objectCount').textContent=`${editable.length} objeto${editable.length===1?'':'s'}`;
+  $('objectCount').textContent=\`\${editable.length} objeto\${editable.length===1?'':'s'}\`;
   $('sceneCount').textContent=editable.length;
 }`;
   main = replaceOnce(main, oldHierarchy, newHierarchy, 'hierarchy multi-select');
@@ -250,7 +250,7 @@ export function patchGE21Studio(original) {
   studio = replaceOnce(
     studio,
     '  function refreshSelection() {\n    const root = getRoot();',
-    '  function refreshSelection() {\n    const root = getRoot();\n    const worldCount = $(\\'geV21SelectionCount\\');\n    if (worldCount) worldCount.textContent = (engine.selectedObjects?.length || 0) + \\' seleccionados\\';\n    const settleButton = $(\\'geV21Settle\\');\n    if (settleButton) settleButton.disabled = !(engine.selectedObjects?.length) || !!engine.isPlaying;',
+    '  function refreshSelection() {\n    const root = getRoot();\n    const worldCount = $(\'geV21SelectionCount\');\n    if (worldCount) worldCount.textContent = (engine.selectedObjects?.length || 0) + \' seleccionados\';\n    const settleButton = $(\'geV21Settle\');\n    if (settleButton) settleButton.disabled = !(engine.selectedObjects?.length) || !!engine.isPlaying;',
     'selection-driven world tools state'
   );
   return studio;
