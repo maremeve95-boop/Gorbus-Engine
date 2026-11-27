@@ -1,4 +1,4 @@
-# Gorbus Engine (GE) 1.0.2
+# Gorbus Engine (GE) 1.0.4
 
 Editor de videojuegos 3D para navegador, pensado para funcionar también en Chromebook. La interfaz toma como referencia la distribución de Unity que compartiste: **Hierarchy** a la izquierda, **Scene** en el centro, **Inspector** a la derecha y **Project / Assets** en el panel inferior. Gorbus mantiene su propio estilo y no copia recursos o iconos de Unity.
 
@@ -152,3 +152,31 @@ local rightZ = math.sin(yaw)
 ### Alcance y limitaciones
 
 Pointer Lock depende de permisos y soporte del navegador; el botón de autorización es la alternativa si una llamada programática no conserva el gesto del usuario. `getMouseDelta` devuelve desplazamiento en píxeles, no una velocidad física independiente del intervalo; el script puede dividirlo por `dt` si necesita una tasa. El componente Camera activa la primera cámara de la escena; todavía no hay selector de prioridad para varias cámaras.
+
+## GE 1.0.4 — controlador de personaje, cápsula física y escena contextual para Gorbus AI
+
+### Controlador FPS y movimiento WASD corregido
+- Se corrige la inversión de W/S y A/D del ejemplo anterior. La cámara de primera persona y el ejemplo anterior utilizaban convenciones de ejes distintas.
+- Gorbus.controlCharacter(speed, jumpImpulse, playerName) obtiene los vectores delante y derecha de la orientación mundial de la cámara activa. W sigue la mirada, S retrocede, D se desplaza a la derecha de la pantalla y A a la izquierda.
+- playerName es opcional y por defecto usa Player. El personaje necesita Rigidbody dinámico y Capsule Collider; el suelo debe tener un collider estático.
+- El controlador conserva la velocidad vertical de Rapier, normaliza el movimiento diagonal y permite saltar al detectar contacto con el suelo u otra superficie.
+- examples/first-person-camera.luau está actualizado para usar el controlador nativo.
+
+### Cápsula nativa y sensores
+- Capsule Collider aparece en Añadir componente y crea un RAPIER.ColliderDesc.capsule(halfHeight, radius) nativo. Las dimensiones se derivan de la malla y su escala. Rapier coloca la cápsula sobre el eje Y.
+- El Inspector incluye Traspasable / Sensor. Si está activo, Rapier detecta contactos pero no bloquea físicamente el paso.
+- En cuerpos estáticos y cinemáticos se oculta el ajuste de rebote; el Inspector actualiza su visibilidad al cambiar el tipo de cuerpo.
+
+### Herramientas de edición
+- Botones magnéticos junto a Mover, Escalar y Rotar activan el ajuste compartido.
+- Mover utiliza pasos de 1 unidad; rotación, 15 grados; escala, 0,1.
+- La consola puede mostrar Ir a línea N cuando un error contiene una referencia a main.luau:N. Al pulsarlo, abre Luau Scripts y selecciona esa línea.
+
+### Contexto real para Gorbus AI
+- Antes de llamar a Puter, Gorbus envía una captura de los objetos de escena con nombre, tipo, posición, rotación, escala, visibilidad, color, componentes, prefab, configuración física, sensores, waypoints y vínculos de puerta.
+- Incluye el objeto seleccionado, el script actual y los scripts disponibles para el asistente.
+- Se adjuntan hasta 120 objetos por petición; si la escena contiene más, el contexto informa cuántos se han omitido.
+- El prompt de Gorbus AI indica que use los objetos y componentes reales y que no invente nombres ni APIs.
+
+### Comprobaciones
+La CI comprueba restauración y sintaxis de los módulos, creación de una cápsula y un sensor con Rapier, orientación de los vectores de movimiento para cuatro ángulos de cámara, compilación del ejemplo Luau y las funciones matemáticas estándar. Estas pruebas no sustituyen una prueba manual del personaje y Pointer Lock en el navegador.
