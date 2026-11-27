@@ -36,11 +36,12 @@ Primer corte nativo del proyecto STRYDE v1.4, preparado para Gorbus Engine. Esta
 
 ## Qué todavía no está portado
 
-La versión HTML original contiene diez modos, tienda, cosméticos, progreso, misiones, logros, bots, minijuego Garra, varios mapas, sonido procedural y música. Gorbus Engine todavía no ofrece en su API Luau actual una capa nativa de HUD/UI de juego, audio, persistencia de datos de partida ni red. Por eso esta primera versión se centra en validar movimiento, cámara, raycast, objetivos y bucle de puntuación. El marcador se comunica mediante la consola del editor. No se ha presentado la tienda, el multijugador, las armas visuales ni los bots como si estuvieran terminados.
+La versión HTML original contiene diez modos, tienda, cosméticos, progreso, misiones, logros, bots, minijuego Garra, varios mapas, sonido procedural y música. Este port añade un HUD nativo limitado para esta ronda (temporizador, puntos, precisión, eliminaciones, arma y rango), pero Gorbus todavía no tiene un editor general de HUD/UI para juegos, audio de juego, persistencia de datos de partida ni red en la API Luau. No se ha presentado la tienda, el multijugador, las armas visuales, los bots ni los otros modos como si estuvieran terminados.
 
 ## Mejoras respecto al primer corte
 
 - Escena separada del HTML original y serializada como proyecto `.gorbus` editable.
+- HUD de ronda creado por la API runtime de Gorbus y alojado dentro del viewport, con eventos de impacto.
 - Física de jugador y arena nativa del motor en vez de colisiones calculadas a mano.
 - Objetivos móviles actualizados a intervalos limitados para reducir trabajo por frame.
 - Estado de partida controlado por Luau con reinicio y resultados reproducibles.
