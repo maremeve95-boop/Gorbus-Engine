@@ -65,6 +65,15 @@ local function resetTarget(target)
     Gorbus.setColor(target.name, "#a8dcff")
 end
 
+local function accuracyPercent(): number
+    if shots <= 0 then return 0 end
+    return math.floor((hits / shots) * 100 + 0.5)
+end
+
+local function updateHUD(rank: string?)
+    Gorbus.setGameHUD(remaining, score, accuracyPercent(), weapons[weaponIndex].name, eliminations, rank or "--")
+end
+
 local function resetRound()
     elapsed = 0
     remaining = ROUND_SECONDS
@@ -94,15 +103,6 @@ local function resetRound()
     end
 
     Gorbus.log("STRYDE · NUEVA RONDA | 60 segundos | munición infinita")
-end
-
-local function accuracyPercent(): number
-    if shots <= 0 then return 0 end
-    return math.floor((hits / shots) * 100 + 0.5)
-end
-
-local function updateHUD(rank: string?)
-    Gorbus.setGameHUD(remaining, score, accuracyPercent(), weapons[weaponIndex].name, eliminations, rank or "--")
 end
 
 local function finishRound()
