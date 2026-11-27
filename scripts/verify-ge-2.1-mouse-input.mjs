@@ -8,7 +8,8 @@ const checks = [
   ['mouse input state clears on blur', main.includes('mouseButtonsDown.clear();mouseButtonsJustPressed.clear()')],
   ['Luau exposes down and just-pressed mouse APIs', main.includes('isMouseButtonDown:(button=0)') && main.includes('isMouseButtonJustPressed:(button=0)')],
   ['mouse just-pressed state clears after each Luau tick', main.includes('keysJustPressed.clear();\n            mouseButtonsJustPressed.clear();')],
-  ['mouse button API is documented for Gorbus AI', main.includes('Gorbus.isMouseButtonDown(button=0)') && main.includes('Gorbus.isMouseButtonJustPressed(button=0)')]
+  ['mouse button API is documented for Gorbus AI', main.includes('Gorbus.isMouseButtonDown(button=0)') && main.includes('Gorbus.isMouseButtonJustPressed(button=0)')],
+  ['game scripts can hide/show a model without removing physics', main.includes('setObjectVisible:(name,visible)=>') && main.includes('Gorbus.setObjectVisible(name,visible)')]
 ];
 for (const [label, passed] of checks) {
   console.log(`${passed ? 'PASS' : 'FAIL'} ${label}`);
