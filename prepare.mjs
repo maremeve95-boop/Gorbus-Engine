@@ -352,3 +352,36 @@ writeFileSync(mainPath, patchGE21MouseInput(readFileSync(mainPath, 'utf8')));
 const { patchGE21RuntimeHUD } = await import('./scripts/ge-2.1-runtime-hud.mjs');
 writeFileSync(mainPath, patchGE21RuntimeHUD(readFileSync(mainPath, 'utf8')));
 console.log('Gorbus Engine GE 2.1 Preview: multi-selection, physics placement, mouse input and native runtime HUD enabled.');
+ 
+// Gorbus Engine 2.1.0: deterministic release overlay (allow-listed + SHA-256 verified).
+const ge210Parts = Array.from({ length: 12 }, (_, index) =>
+  readFileSync(resolve('build-assets', `ge210-release-${String(index + 1).padStart(2, '0')}.br64`), 'utf8').trim()
+);
+const ge210Compressed = Buffer.from(ge210Parts.join(''), 'base64');
+const ge210Digest = createHash('sha256').update(ge210Compressed).digest('hex');
+if (ge210Digest !== '515dafaa3f94d798da4365f041398ee652d9e7a215b12603dd3770b9e0e18387') {
+  throw new Error('Gorbus Engine 2.1.0 release archive failed SHA-256 integrity verification.');
+}
+const ge210Files = JSON.parse(brotliDecompressSync(ge210Compressed).toString('utf8'));
+const ge210AllowedFiles = new Set([
+  'scripts/ge-2.1.0-release.mjs',
+  'scripts/verify-ge-2.1.0.mjs',
+  'docs/GE_2.1.0_RELEASE.md'
+]);
+for (const [relativePath, fileContent] of Object.entries(ge210Files)) {
+  if (!ge210AllowedFiles.has(relativePath) || typeof fileContent !== 'string') {
+    throw new Error('Unexpected Gorbus Engine 2.1.0 release overlay entry: ' + relativePath);
+  }
+  const target = resolve(relativePath);
+  mkdirSync(dirname(target), { recursive: true });
+  writeFileSync(target, fileContent);
+}
+const { patchGE210Main, patchGE210HTML, patchGE210CSS } = await import('./scripts/ge-2.1.0-release.mjs');
+main = patchGE210Main(readFileSync(mainPath, 'utf8'));
+writeFileSync(mainPath, main);
+html = patchGE210HTML(readFileSync(htmlPath, 'utf8'));
+writeFileSync(htmlPath, html);
+const ge210CssPath = resolve('styles.css');
+writeFileSync(ge210CssPath, patchGE210CSS(readFileSync(ge210CssPath, 'utf8')));
+console.log('Gorbus Engine 2.1.0 Release Preview: script tabs, HTML migration, FPS capsule, project library, procedural assets, ECS-lite, Crowd Bake, keyframes and UI scaffolds enabled.');
+
