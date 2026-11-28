@@ -2,7 +2,7 @@ name: Gorbus Engine 3.0.0 Preview
 
 on:
   push:
-    branches: [main, release/ge-3.0.0]
+    branches: [main, release/ge-3.0.0, release/ge-3.1.0]
   pull_request:
     branches: [main]
 
@@ -20,6 +20,8 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Restore and verify GE 3.0.0 sources
         run: npm run check
+      - name: Inspect generated GE 3.1 UI
+        run: node scripts/ge-3.1-inspect-generated-ui.mjs
       - name: Build production bundle
         run: npm run build
       - name: Package source ZIP
