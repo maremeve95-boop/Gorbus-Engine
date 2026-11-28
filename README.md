@@ -1,4 +1,4 @@
-# Gorbus Engine [v3.0.0] — Preview
+# Gorbus Engine [v3.1.0] — Release Preview
 
 Editor web para desarrollar juegos 2D y 3D con Three.js, Rapier y scripts Luau. Esta entrega amplía la base GE 1.0.4.
 
@@ -76,7 +76,7 @@ La restauración aplica estas herramientas después de GE 2.0.0 en cada ejecuci�
 
 El repositorio conserva el sistema de capas comprimidas que ya utilizaba el proyecto. El código de GE 2.0.0 se almacena en `build-assets/ge200-overlay-*.br64`; `prepare.mjs` concatena los diez fragmentos, valida el SHA-256 del archivo comprimido y restaura únicamente las rutas permitidas antes de aplicar las mejoras al editor. Así, `npm run dev`, `npm run check` y `npm run build` parten de las mismas fuentes restauradas. No edites los fragmentos a mano: cambia el archivo fuente restaurado, actualiza el overlay y su hash como una única operación.
 
-## Gorbus Engine 2.1.0 — novedades
+## GE 2.1.0 — novedades históricas
 
 Esta release preview moderniza el lanzador de proyectos, añade ventanas de script multiarchivo con números de línea y resaltado de sintaxis inicial, asistente de migración de HTML/CSS/JS mediante Gorbus AI, plantilla FPS con cápsula física y un HUD de juego de ejemplo.
 
@@ -86,7 +86,7 @@ También incluye herramientas de mundo GE 2.1, assets procedurales, un registro 
 
 Consulta `docs/GE_2.1.0_RELEASE.md` para las funciones incluidas, las limitaciones y los pasos de validación.
 
-## Gorbus Engine 3.0.0 — Preview
+## Gorbus Engine 3.0.0 — Preview (anterior)
 
 Esta rama añade un profiler runtime, APIs para consultar/modificar transforms durante Play, una herramienta CLI de diagnóstico y una primera API de UI 2D en pantalla. Consulta `docs/GE_3.0.0_PREVIEW.md` para ejemplos, límites y funciones pendientes. La Preview no afirma tener 110 subsistemas nuevos terminados.
 
@@ -98,11 +98,21 @@ Esta rama añade un profiler runtime, APIs para consultar/modificar transforms d
 
 El profiler mide estadísticas del renderer y no atribuye todavía CPU por sistema, GPU real ni memoria total del proceso. El diagnóstico es estructural, no compila ni ejecuta Luau. Estas herramientas son una primera base para optimizar proyectos con datos, no una promesa de rendimiento universal.
 
-## UI 2D durante Play — API inicial GE 3.0.0
+## UI 2D durante Play — API inicial GE 3.0.0 (conservada)
 
 Los scripts Luau pueden crear paneles, textos y botones responsive en el viewport con `Gorbus.uiCreatePanel`, `Gorbus.uiCreateText` y `Gorbus.uiCreateButton`. La posición y el tamaño se expresan como porcentajes de pantalla; se pueden modificar con `uiSetRect`, `uiSetText`, `uiSetVisible` y estilos limitados mediante `uiSetStyle`. Los clics se leen con `uiWasClicked`.
 
 La API usa texto plano y una lista permitida de estilos. Es una primera capa **2D screen-space**: todavía no hay un editor visual completo ni botones/paneles interactivos anclados al mundo 3D. Consulta `docs/GE_3.0.0_PREVIEW.md`.
+
+## Gorbus Engine 3.1.0 — lanzador y plantillas
+
+- La web ahora abre directamente la galería de experiencias con barra lateral compacta y filtros Todo, Vacío, Jugabilidad y Temáticos.
+- Diez plantillas 3D nuevas construyen escenas editables: Classic Baseplate, Flat Terrain, Village, Castle, Suburban, Pirate Island, Modern City, Starting Place, Classic Obby y Racing.
+- Se actualizan el título de la página, la introducción, el viewport, los metadatos y el paquete a 3.1.0.
+- Los proyectos `.gorbus`, la biblioteca local y las portadas PNG/JPG se conservan.
+- Las miniaturas de plantillas son artes CSS; no se anuncian como capturas 3D reales.
+
+Consulta `docs/GE_3.1.0_RELEASE.md` para el alcance y las limitaciones.
 
 ## Ejecutar localmente
 
