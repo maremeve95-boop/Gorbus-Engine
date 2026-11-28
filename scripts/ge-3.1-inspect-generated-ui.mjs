@@ -38,3 +38,11 @@ for(const [path,start,end] of [
   ['src/main.js',455,610],
   ['src/main.js',680,780]
 ]) if(existsSync(path)) range(path,start,end);
+
+for(const [path,start,end] of [
+  ['index.html',1,42],
+  ['styles.css',25,42],
+  ['styles.css',144,158],
+  ['src/main.js',775,850],
+  ['src/main.js',1840,1974]
+]) if(existsSync(path)) range(path,start,end);
