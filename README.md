@@ -1,4 +1,4 @@
-# Gorbus Engine — GE 2.0.0 Patched
+# Gorbus Engine [v3.0.0] — Preview
 
 Editor web para desarrollar juegos 2D y 3D con Three.js, Rapier y scripts Luau. Esta entrega amplía la base GE 1.0.4.
 
@@ -76,6 +76,34 @@ La restauración aplica estas herramientas después de GE 2.0.0 en cada ejecuci�
 
 El repositorio conserva el sistema de capas comprimidas que ya utilizaba el proyecto. El código de GE 2.0.0 se almacena en `build-assets/ge200-overlay-*.br64`; `prepare.mjs` concatena los diez fragmentos, valida el SHA-256 del archivo comprimido y restaura únicamente las rutas permitidas antes de aplicar las mejoras al editor. Así, `npm run dev`, `npm run check` y `npm run build` parten de las mismas fuentes restauradas. No edites los fragmentos a mano: cambia el archivo fuente restaurado, actualiza el overlay y su hash como una única operación.
 
+## Gorbus Engine 2.1.0 — novedades
+
+Esta release preview moderniza el lanzador de proyectos, añade ventanas de script multiarchivo con números de línea y resaltado de sintaxis inicial, asistente de migración de HTML/CSS/JS mediante Gorbus AI, plantilla FPS con cápsula física y un HUD de juego de ejemplo.
+
+También incluye herramientas de mundo GE 2.1, assets procedurales, un registro ECS-lite, Crowd Bake mediante instancing, keyframes básicos y plantillas de UI web responsive.
+
+**Alcance:** el port HTML es asistido por IA y requiere revisión; los archivos Web se guardan en `Web/` y pueden previsualizarse, pero Play ejecuta Luau. Crowd Bake usa instancing y proxies, no 500 rigs esqueléticos independientes. ECS-lite es un registro de entidades, no un motor ECS completo. Keyframes básicos no equivalen a un animador inteligente. La UI Builder crea scaffolds web, no un editor completo de HUD nativo.
+
+Consulta `docs/GE_2.1.0_RELEASE.md` para las funciones incluidas, las limitaciones y los pasos de validación.
+
+## Gorbus Engine 3.0.0 — Preview
+
+Esta rama añade un profiler runtime, APIs para consultar/modificar transforms durante Play, una herramienta CLI de diagnóstico y una primera API de UI 2D en pantalla. Consulta `docs/GE_3.0.0_PREVIEW.md` para ejemplos, límites y funciones pendientes. La Preview no afirma tener 110 subsistemas nuevos terminados.
+
+## Gorbus Engine 3.0.0 — profiler y diagnóstico
+
+- **Profiler runtime:** muestra FPS aproximados, frame time, draw calls, triángulos, geometrías, texturas y memoria JS cuando el navegador expone esa métrica. Se activa desde Luau con `Gorbus.setProfilerVisible(true)` y se oculta con `false`.
+- **Transform API:** `getObjectScale`, `setObjectScale`, `getObjectRotation` y `setObjectRotation` permiten consultar y cambiar escala/rotación durante Play. La rotación usa grados.
+- **Diagnóstico de proyectos:** ejecuta `npm run diagnose -- ruta/al/proyecto.gorbus` para detectar nombres duplicados, transforms inválidos, archivos de script vacíos y algunas incoherencias físicas.
+
+El profiler mide estadísticas del renderer y no atribuye todavía CPU por sistema, GPU real ni memoria total del proceso. El diagnóstico es estructural, no compila ni ejecuta Luau. Estas herramientas son una primera base para optimizar proyectos con datos, no una promesa de rendimiento universal.
+
+## UI 2D durante Play — API inicial GE 3.0.0
+
+Los scripts Luau pueden crear paneles, textos y botones responsive en el viewport con `Gorbus.uiCreatePanel`, `Gorbus.uiCreateText` y `Gorbus.uiCreateButton`. La posición y el tamaño se expresan como porcentajes de pantalla; se pueden modificar con `uiSetRect`, `uiSetText`, `uiSetVisible` y estilos limitados mediante `uiSetStyle`. Los clics se leen con `uiWasClicked`.
+
+La API usa texto plano y una lista permitida de estilos. Es una primera capa **2D screen-space**: todavía no hay un editor visual completo ni botones/paneles interactivos anclados al mundo 3D. Consulta `docs/GE_3.0.0_PREVIEW.md`.
+
 ## Ejecutar localmente
 
 Requisitos: Node.js `>=20.19` (se recomienda Node 22) y conexión a Internet para instalar dependencias.
@@ -104,12 +132,6 @@ npm run build
 ```
 
 Para Vercel: instalación `npm install`, build `npm run build`, directorio de salida `dist`.
-
-## Port nativo de STRYDE v1.4
-
-Se ha iniciado un port nativo del juego STRYDE v1.4 en `ports/stryde-v14/`. La primera entrega es **Campo Orión / Entrenamiento**, adaptado como un reto arcade de escaneo: escena `.gorbus`, script Luau, jugador en primera persona, cuatro modos de escaneo, seis balizas (tres móviles) y HUD nativo del viewport con temporizador, puntos, precisión, balizas activadas y rango.
-
-Esta fase se centra en validar cámara, movimiento, raycast, física, balizas y puntuación. El HUD implementado es específico para esta ronda; todavía no existe un editor general de HUD/UI de juegos. Los otros modos originales, bots, tienda, cosméticos, progreso persistente, audio y red siguen pendientes. Consulta `ports/stryde-v14/README.md` para abrir la escena.
 
 ## Tecnologías
 
