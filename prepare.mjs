@@ -418,11 +418,11 @@ writeFileSync(mainPath, main);
 console.log('Gorbus Engine 3.0.0: responsive 2D runtime UI API enabled.');
 
 // Gorbus Engine 3.1.0: compact experience browser, template gallery and fresh version metadata.
-const { patchGE310Main, patchGE310HTML, patchGE310CSS } = await import('./scripts/ge-3.1-start-screen.mjs');
-main = patchGE310Main(readFileSync(mainPath, 'utf8'));
+const { patchGE320Main, patchGE320HTML, patchGE320CSS } = await import('./scripts/ge-3.2-launcher.mjs');
+main = patchGE320Main(readFileSync(mainPath, 'utf8'));
 writeFileSync(mainPath, main);
-html = patchGE310HTML(readFileSync(htmlPath, 'utf8'));
+html = patchGE320HTML(readFileSync(htmlPath, 'utf8'));
 writeFileSync(htmlPath, html);
-writeFileSync(resolve('styles.css'), patchGE310CSS(readFileSync(resolve('styles.css'), 'utf8')));
-console.log('Gorbus Engine 3.1.0: experience browser, template gallery and responsive start screen enabled.');
+writeFileSync(resolve('styles.css'), patchGE320CSS(readFileSync(resolve('styles.css'), 'utf8')));
+console.log('Gorbus Engine 3.2.0: curated 2D/3D gallery, template search and responsive launcher enabled.');
 
