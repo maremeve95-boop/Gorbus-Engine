@@ -5,14 +5,14 @@ function replaceOnce(source, before, after, label) {
 }
 export function patchGE320Main(original) {
  let main=original;
- if(!main.includes('function installGE310StartScreen()')){
+ if(!main.includes('function installGE320StartScreen()')){
   const installer=[
-"function installGE310StartScreen(){",
+"function installGE320StartScreen(){",
 "  const sidebar=document.querySelector('.start-sidebar');",
 "  if(sidebar&&!document.getElementById('ge32NewExperience')){const button=document.createElement('button');button.id='ge32NewExperience';button.type='button';button.className='ge32-new-experience';button.innerHTML='<span>＋</span><small>Nueva<br>experiencia</small>';button.addEventListener('click',()=>showCreateProject('baseplate'));sidebar.prepend(button);}",
 "  if(sidebar){const order=['recent','home','projects','templates','archive'];const nodes=order.map(key=>sidebar.querySelector('.start-side-link[data-home-tab='+String.fromCharCode(34)+key+String.fromCharCode(34)+']')).filter(Boolean);const footer=sidebar.querySelector('.sidebar-bottom');nodes.forEach(node=>footer?sidebar.insertBefore(node,footer):sidebar.appendChild(node));const labels={recent:'Recientes',home:'Inicio',projects:'Experiencias',templates:'Plantillas',archive:'Archivo'};for(const [key,label] of Object.entries(labels)){const node=sidebar.querySelector('.start-side-link[data-home-tab='+String.fromCharCode(34)+key+String.fromCharCode(34)+']');if(node){const icon=node.querySelector('span')?.textContent||'•';node.innerHTML='<span>'+icon+'</span><small>'+label+'</small>';}}const version=sidebar.querySelector('.start-version');if(version)version.textContent='3.2.0';}",
 "  const section=document.getElementById('homeViewTemplates');const grid=section?.querySelector('.templates-page-grid');",
-""  if(section&&grid&&!document.getElementById('ge32TemplateToolbar')){",
+"  if(section&&grid&&!document.getElementById('ge32TemplateToolbar')){",
 "    const toolbar=document.createElement('div');toolbar.id='ge32TemplateToolbar';toolbar.className='ge32-template-toolbar';",
 "    toolbar.innerHTML='<div class=\"ge32-filter-group\" role=\"group\" aria-label=\"Filtrar plantillas\"><button class=\"ge32-filter active\" type=\"button\" data-ge32-filter=\"all\" aria-pressed=\"true\">Todo</button><button class=\"ge32-filter\" type=\"button\" data-ge32-filter=\"3d\" aria-pressed=\"false\">3D</button><button class=\"ge32-filter\" type=\"button\" data-ge32-filter=\"2d\" aria-pressed=\"false\">2D</button></div><label class=\"ge32-template-search\"><span>⌕</span><input id=\"ge32TemplateSearch\" type=\"search\" maxlength=\"64\" placeholder=\"Buscar plantillas…\" aria-label=\"Buscar plantillas\"></label><div class=\"ge32-toolbar-right\"><span>GORBUS ENGINE</span><b>3.2.0</b><button type=\"button\" id=\"ge32OpenProject\" title=\"Abrir archivo .gorbus\">↥ Abrir</button></div>';",
 "    section.insertBefore(toolbar,grid);toolbar.querySelector('#ge32OpenProject')?.addEventListener('click',()=>document.getElementById('sceneFileInput')?.click());",
@@ -24,10 +24,10 @@ export function patchGE320Main(original) {
 "  const applyTemplateFilters=()=>{const category=filters.find(button=>button.classList.contains('active'))?.dataset.ge32Filter||'all';const query=(search?.value||'').trim().toLocaleLowerCase();for(const card of grid.querySelectorAll('.template-card[data-template]')){const matchesCategory=category==='all'||card.dataset.ge32Category===category;const matchesText=!query||(card.textContent||'').toLocaleLowerCase().includes(query);card.hidden=!(matchesCategory&&matchesText);}};",
 "  filters.forEach(button=>button.addEventListener('click',()=>{filters.forEach(item=>{const active=item===button;item.classList.toggle('active',active);item.setAttribute('aria-pressed',active?'true':'false');});applyTemplateFilters();}));",
 "  search?.addEventListener('input',applyTemplateFilters);",
-  if(typeof switchReleaseHomeTab==='function')switchReleaseHomeTab('templates');",
+"  if(typeof switchReleaseHomeTab==='function')switchReleaseHomeTab('templates');",
 "}"
   ].join('\n');
-  main=replaceOnce(main,'\nrequestAnimationFrame(animate);\n','\n'+installer+'\ninstallGE310StartScreen();\nrequestAnimationFrame(animate);\n','launcher installer');
+  main=replaceOnce(main,'\nrequestAnimationFrame(animate);\n','\n'+installer+'\ninstallGE320StartScreen();\nrequestAnimationFrame(animate);\n','launcher installer');
  }
  main=main.replaceAll('Gorbus Engine 0.6 listo.','Gorbus Engine 3.2.0 listo.');
  main=main.replaceAll('-- Gorbus Engine 2.1.0 · First Person Controller','-- Gorbus Engine 3.2.0 · First Person Explorer');
