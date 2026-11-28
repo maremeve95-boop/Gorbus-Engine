@@ -45,7 +45,7 @@ const uiHelpers = [
 ].join('\n');
 export function patchGE300UIRuntime(input) {
   let main = input;
-  if (!main.includes('function ensureGorbusRuntimeUIRoot()')) main = replaceOnce(main,'function createLuauBridge(scriptObjectName=null){',uiHelpers+'\\nfunction createLuauBridge(scriptObjectName=null){','UI runtime helpers');
+  if (!main.includes('function ensureGorbusRuntimeUIRoot()')) main = replaceOnce(main,'function createLuauBridge(scriptObjectName=null){',uiHelpers+'\nfunction createLuauBridge(scriptObjectName=null){','UI runtime helpers');
   if (!main.includes('uiCreatePanel:(id,x,y,width,height,text')) main = replaceOnce(main,'    clearGameHUD:()=>clearGorbusRuntimeHUD(),',[
     '    clearGameHUD:()=>clearGorbusRuntimeHUD(),',
     '    uiCreatePanel:(id,x,y,width,height,text="")=>createGorbusUIElement(id,"panel",text,x,y,width,height),',
@@ -58,8 +58,8 @@ export function patchGE300UIRuntime(input) {
     '    uiWasClicked:(id)=>wasGorbusUIClicked(id),',
     '    uiDestroy:(id)=>destroyGorbusUIElement(id),',
     '    uiClear:()=>clearGorbusRuntimeUI(),'
-  ].join('\\n'),'public UI bridge API');
+  ].join('\n'),'public UI bridge API');
   const doc='- Gorbus.clearGameHUD(): retira el HUD al terminar el juego.';
-  if(!main.includes('Gorbus.uiCreatePanel')) main=replaceOnce(main,doc,doc+'\\n- Gorbus.uiCreatePanel / uiCreateText / uiCreateButton crean paneles, textos y botones 2D responsive en el viewport; posición y tamaño en porcentaje.\\n- uiSetText, uiSetVisible, uiSetRect, uiSetStyle, uiWasClicked, uiDestroy y uiClear permiten actualizarlos y recibir clics.\\n- El texto se asigna con textContent y los estilos están allowlisted. Es UI 2D en pantalla; todavía no crea UI interactiva en el espacio 3D.','UI API documentation');
+  if(!main.includes('Gorbus.uiCreatePanel')) main=replaceOnce(main,doc,doc+'\n- Gorbus.uiCreatePanel / uiCreateText / uiCreateButton crean paneles, textos y botones 2D responsive en el viewport; posición y tamaño en porcentaje.\n- uiSetText, uiSetVisible, uiSetRect, uiSetStyle, uiWasClicked, uiDestroy y uiClear permiten actualizarlos y recibir clics.\n- El texto se asigna con textContent y los estilos están allowlisted. Es UI 2D en pantalla; todavía no crea UI interactiva en el espacio 3D.','UI API documentation');
   return main;
 }
