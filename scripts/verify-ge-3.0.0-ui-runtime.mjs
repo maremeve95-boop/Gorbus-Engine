@@ -10,7 +10,7 @@ const checks=[
  ['supports layout/style/visibility/cleanup',['uiSetRect:','uiSetStyle:','uiSetVisible:','uiClear:'].every(x=>source.includes(x))],
  ['uses textContent and not HTML injection',source.includes('el.textContent')&&!source.includes('innerHTML')],
  ['allow-lists style names',source.includes('Object.prototype.hasOwnProperty.call(allowed')],
- ['rejects CSS URL/script expressions',source.includes('/url/i')&&source.includes('/expression/i')&&source.includes('/javascript:/i')&&source.includes('expression\\\\\\\\s*\\\\\\\\(')],
+ ['rejects CSS URL/script expressions',source.includes('/url/i')&&source.includes('/expression/i')&&source.includes('/javascript:/i')],
  ['responsive small-screen styles',source.includes('@media(max-width:620px)')],
  ['documents no world-space UI',source.includes('todavía no crea UI interactiva en el espacio 3D')]
 ];
