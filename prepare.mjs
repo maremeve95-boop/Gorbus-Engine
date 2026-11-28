@@ -411,3 +411,9 @@ main = patchGE300Main(readFileSync(mainPath, 'utf8'));
 writeFileSync(mainPath, main);
 console.log('Gorbus Engine 3.0.0: runtime profiler, scene metrics and runtime transform APIs enabled.');
 
+// GE 3.0.0: responsive screen-space UI API for Luau game scripts.
+const { patchGE300UIRuntime } = await import('./scripts/ge-3.0.0-ui-runtime.mjs');
+main = patchGE300UIRuntime(readFileSync(mainPath, 'utf8'));
+writeFileSync(mainPath, main);
+console.log('Gorbus Engine 3.0.0: responsive 2D runtime UI API enabled.');
+

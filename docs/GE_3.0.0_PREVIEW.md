@@ -1,6 +1,6 @@
 # Gorbus Engine 3.0.0 — Preview
 
-GE 3.0.0 is a development preview based on the 2.1.0 release branch. It preserves the 2D/3D editor, Luau runtime, Rapier physics, multi-file scripts, AI-assisted web migration, world tools and the NEON RELAY sample.
+GE 3.0.0 is a development preview based on the 2.1.0 release branch. It preserves the 2D/3D editor, Luau runtime, Rapier physics, multi-file scripts, AI-assisted web migration and world tools.
 
 ## New tools implemented
 
@@ -31,11 +31,33 @@ Read a JSON snapshot with `Gorbus.getPerformanceStatsJSON()`.
 
 Rotation values are degrees. Calls return a transform object or boolean success value.
 
+### 3. Responsive screen-space UI (2D)
+
+Luau can create viewport elements without embedding a separate game HTML page:
+
+```lua
+function onStart()
+    Gorbus.uiCreatePanel("menu", 20, 15, 60, 70, "")
+    Gorbus.uiCreateText("title", "MY GAME", 30, 22, 40, 10)
+    Gorbus.uiCreateButton("play", "PLAY", 38, 48, 24, 8)
+end
+
+function onUpdate(dt)
+    if Gorbus.uiWasClicked("play") then
+        Gorbus.uiSetText("title", "RUNNING")
+    end
+end
+```
+
+Available methods: `uiCreatePanel`, `uiCreateText`, `uiCreateButton`, `uiSetText`, `uiSetVisible`, `uiSetRect`, `uiSetStyle`, `uiWasClicked`, `uiDestroy` and `uiClear`. Layout positions/sizes use percentages of the game viewport. Text is assigned as `textContent`; style properties are allow-listed and reject URLs/script expressions.
+
+**Limitations:** this is a 2D overlay over the 3D/2D viewport, not a visual designer. There is no world-space 3D UI, texture/image component, anchors/constraints tree, flex/grid layout editor, sliders or full accessibility/navigation model yet.
+
 ### 3. Project diagnostics CLI
 Run:
 
 ```bash
-npm run diagnose -- samples/NEON_RELAY/NEON_RELAY.gorbus
+npm run diagnose -- ruta/al/proyecto.gorbus
 ```
 
 The checker reports duplicate/empty object names, malformed position/rotation/scale arrays, dynamic bodies without a Rigidbody component, capsules without Capsule Collider, empty script entries and malformed scene structure. It exits with code 1 when structural errors are found.
@@ -46,7 +68,7 @@ This is a static project-file inspection tool. It does not execute or compile Lu
 
 The CI pipeline runs:
 - Existing GE 2.0 and GE 2.1 structural checks.
-- NEON RELAY sample consistency checks.
+- GE 3.0 screen-space UI runtime API and patch-idempotency checks.
 - GE 3.0 profiler patch idempotency and API checks.
 - Project diagnostics tests using both deliberately invalid and valid fixture scenes.
 - Vite production build and ZIP artifact packaging.
@@ -60,7 +82,7 @@ These are not included as finished capabilities in this preview:
 - Undoable preview/cancel workflow for physics placement.
 - 100/250/500 crowd benchmarks and baked animation textures.
 - Full keyframe animation graph, retargeting and IK.
-- Native responsive in-game UI editor and secure HTML/JS bridge.
+- Visual in-game UI editor, world-space 3D UI, and a secure HTML/JS bridge.
 - Automated HTML-to-Luau semantic conversion.
 - Browser-based end-to-end testing on desktop and mobile.
 
