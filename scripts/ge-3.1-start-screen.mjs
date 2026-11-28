@@ -63,7 +63,7 @@ export function patchGE310Main(original) {
 "  if(typeof switchReleaseHomeTab==='function')switchReleaseHomeTab('templates');",
 "}"
   ].join('\n');
-  main=replaceOnce(main,'requestAnimationFrame(animate);',installer+'\ninstallGE310StartScreen();\nrequestAnimationFrame(animate);','launcher installer');
+  main=replaceOnce(main,'\nrequestAnimationFrame(animate);\n','\n'+installer+'\ninstallGE310StartScreen();\nrequestAnimationFrame(animate);\n','launcher installer');
  }
  main=main.replaceAll('Gorbus Engine 0.6 listo.','Gorbus Engine 3.1.0 listo.');
  main=main.replaceAll('-- Gorbus Engine 2.1.0 · First Person Controller','-- Gorbus Engine 3.1.0 · First Person Explorer');
