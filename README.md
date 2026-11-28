@@ -1,4 +1,4 @@
-# Gorbus Engine [v3.1.0] — Release Preview
+# Gorbus Engine [v3.2.0] — Release
 
 Editor web para desarrollar juegos 2D y 3D con Three.js, Rapier y scripts Luau. Esta entrega amplía la base GE 1.0.4.
 
@@ -104,15 +104,15 @@ Los scripts Luau pueden crear paneles, textos y botones responsive en el viewpor
 
 La API usa texto plano y una lista permitida de estilos. Es una primera capa **2D screen-space**: todavía no hay un editor visual completo ni botones/paneles interactivos anclados al mundo 3D. Consulta `docs/GE_3.0.0_PREVIEW.md`.
 
-## Gorbus Engine 3.1.0 — lanzador y plantillas
+## Gorbus Engine 3.2.0 — galería depurada
 
-- La web ahora abre directamente la galería de experiencias con barra lateral compacta y filtros Todo, Vacío, Jugabilidad y Temáticos.
-- Diez plantillas 3D nuevas construyen escenas editables: Classic Baseplate, Flat Terrain, Village, Castle, Suburban, Pirate Island, Modern City, Starting Place, Classic Obby y Racing.
-- Se actualizan el título de la página, la introducción, el viewport, los metadatos y el paquete a 3.1.0.
-- Los proyectos `.gorbus`, la biblioteca local y las portadas PNG/JPG se conservan.
-- Las miniaturas de plantillas son artes CSS; no se anuncian como capturas 3D reales.
+- Se eliminan del catálogo y del código generador las diez plantillas añadidas en 3.1.0; se conservan las plantillas originales del editor.
+- Se retiran también sus constructores de escena y estilos de miniatura para no dejar código muerto.
+- La galería ahora permite buscar por nombre y descripción, combinando la búsqueda con filtros Todo, 3D y 2D.
+- Las tarjetas conservan proporción panorámica y muestran descripciones con texto más legible.
+- Se mantienen la barra lateral, Nueva experiencia, la biblioteca de proyectos, las portadas PNG/JPG y la importación `.gorbus`.
 
-Consulta `docs/GE_3.1.0_RELEASE.md` para el alcance y las limitaciones.
+Consulta `docs/GE_3.2.0_RELEASE.md` para el alcance y las pruebas.
 
 ## Ejecutar localmente
 

@@ -1,8 +1,8 @@
-name: Gorbus Engine 3.1.0 Preview
+name: Gorbus Engine 3.2.0 Release
 
 on:
   push:
-    branches: [main, release/ge-3.0.0, release/ge-3.1.0]
+    branches: [main, release/ge-3.0.0, release/ge-3.1.0, release/ge-3.2.0]
   pull_request:
     branches: [main]
 
@@ -18,15 +18,15 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Restore and verify GE 3.1.0 sources
+      - name: Restore and verify GE 3.2.0 sources
         run: npm run check
       - name: Build production bundle
         run: npm run build
       - name: Package source ZIP
-        run: zip -qr /tmp/Gorbus_Engine_GE_3.1.0_Preview.zip . -x '.git/*' 'node_modules/*' 'dist/*' '*.zip' && cp /tmp/Gorbus_Engine_GE_3.1.0_Preview.zip ./Gorbus_Engine_GE_3.1.0_Preview.zip
+        run: zip -qr /tmp/Gorbus_Engine_GE_3.2.0.zip . -x '.git/*' 'node_modules/*' 'dist/*' '*.zip' && cp /tmp/Gorbus_Engine_GE_3.2.0.zip ./Gorbus_Engine_GE_3.2.0.zip
       - name: Upload source ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: Gorbus-Engine-GE-3.1.0-Preview
-          path: Gorbus_Engine_GE_3.1.0_Preview.zip
+          name: Gorbus-Engine-GE-3.2.0
+          path: Gorbus_Engine_GE_3.2.0.zip
           retention-days: 14
