@@ -14,7 +14,7 @@ const checks=[
  ['responsive small-screen styles',source.includes('@media(max-width:620px)')],
  ['documents no world-space UI',source.includes('todavía no crea UI interactiva en el espacio 3D')]
 ];
-const fixture='function createLuauBridge(scriptObjectName=null){\\n    clearGameHUD:()=>clearGorbusRuntimeHUD(),\\n}\\n- Gorbus.clearGameHUD(): retira el HUD al terminar el juego.';
+const fixture='function createLuauBridge(scriptObjectName=null){\n    clearGameHUD:()=>clearGorbusRuntimeHUD(),\n}\n- Gorbus.clearGameHUD(): retira el HUD al terminar el juego.';
 const once=patchGE300UIRuntime(fixture);
 checks.push(['inserts runtime API',once.includes('ensureGorbusRuntimeUIRoot')&&once.includes('uiCreatePanel:')]);
 checks.push(['documents public API',once.includes('Gorbus.uiCreatePanel')]);
